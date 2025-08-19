@@ -238,6 +238,11 @@
                     </div>
                 </div>
 
+                <div id="dealsSection">
+                    <label for="open_deals" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Open Deals</label>
+                    <textarea id="open_deals" placeholder="Enter open deals..." rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                </div>
+
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
                     <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
@@ -271,10 +276,12 @@
         const COPY_SUMMARY_BUTTON = document.getElementById('copySummaryButton');
         const STATUS_MESSAGE = document.getElementById('statusMessage');
         const METRICS_SECTION = document.getElementById('metricsSection');
+        const DEALS_SECTION = document.getElementById('dealsSection');
+        const OPEN_DEALS_INPUT = document.getElementById('open_deals');
         const LOG_DATE_INPUT = document.getElementById('logDate');
         const NEW_LEADS_INPUT = document.getElementById('newLeads');
         const ESTIMATES_GIVEN_INPUT = document.getElementById('estimatesGiven');
-        const ALL_DATA_FIELDS = document.querySelectorAll('.data-field, #newLeads, #estimatesGiven');
+        const ALL_DATA_FIELDS = document.querySelectorAll('.data-field, #newLeads, #estimatesGiven, #open_deals');
 
         // --- App State ---
         let db, auth;
@@ -397,7 +404,8 @@
             if (currentUser !== 'Elyas') {
                 dataToSave.metrics = {
                     newLeads: NEW_LEADS_INPUT.value,
-                    estimatesGiven: ESTIMATES_GIVEN_INPUT.value
+                    estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
+                    openDeals: OPEN_DEALS_INPUT.value
                 };
             }
 
@@ -413,7 +421,9 @@
 
         // --- UI & Form Logic ---
         function handleUserChange() {
-            METRICS_SECTION.style.display = (USER_SELECT.value === 'Elyas') ? 'none' : 'block';
+            const isElyas = USER_SELECT.value === 'Elyas';
+            METRICS_SECTION.style.display = isElyas ? 'none' : 'block';
+            DEALS_SECTION.style.display = isElyas ? 'none' : 'block';
         }
 
         function handleAddName() {
@@ -445,13 +455,18 @@
             if (userData.metrics) {
                 NEW_LEADS_INPUT.value = userData.metrics.newLeads || 0;
                 ESTIMATES_GIVEN_INPUT.value = userData.metrics.estimatesGiven || 0;
+                OPEN_DEALS_INPUT.value = userData.metrics.openDeals || '';
             }
         }
 
         function clearForm() {
-            ALL_DATA_FIELDS.forEach(field => field.value = (field.type === 'number') ? '0' : '');
-            // Specifically reset textareas to empty strings
-            document.querySelectorAll('.data-field').forEach(ta => ta.value = '');
+            ALL_DATA_FIELDS.forEach(field => {
+                if (field.type === 'number') {
+                    field.value = '0';
+                } else if (field.tagName === 'TEXTAREA') {
+                    field.value = '';
+                }
+            });
         }
 
         function handleCopySummary() {
@@ -460,6 +475,7 @@
                 userName: USER_SELECT.value,
                 newLeads: NEW_LEADS_INPUT.value,
                 estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
+                openDeals: OPEN_DEALS_INPUT.value,
                 activities: {
                     '8-9': document.getElementById('activity_8_9').value, '9-10': document.getElementById('activity_9_10').value,
                     '10-11': document.getElementById('activity_10_11').value, '11-12': document.getElementById('activity_11_12').value,
@@ -481,7 +497,12 @@
             message += "```";
             
             if (data.userName !== 'Elyas') {
-                message += `\n\n--- Tallies ---\nNew Leads Contacted: ${data.newLeads}\nEstimates Given: ${data.estimatesGiven}`;
+                message += `\n\n--- Tallies & Deals ---\n`;
+                message += `New Leads Contacted: ${data.newLeads}\n`;
+                message += `Estimates Given: ${data.estimatesGiven}\n`;
+                if(data.openDeals) {
+                    message += `Open Deals: ${data.openDeals}`;
+                }
             }
 
             navigator.clipboard.writeText(message).then(() => {
