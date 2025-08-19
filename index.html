@@ -20,6 +20,15 @@
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
+        
+        /* CSS RESET FOR BOX SIZING - FIX */
+        html {
+          box-sizing: border-box;
+        }
+        *, *:before, *:after {
+          box-sizing: inherit;
+        }
+
         body {
             font-family: var(--font-body);
             background-color: var(--color-background);
@@ -43,8 +52,6 @@
         .pt-4 { padding-top: 1rem; }
         .px-4 { padding-left: 1rem; padding-right: 1rem; }
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
-        .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
         
         .bg-surface { background-color: var(--color-surface); }
         .bg-transparent { background-color: transparent; }
@@ -55,14 +62,14 @@
 
         .rounded-lg { border-radius: 0.5rem; }
         .rounded-2xl { border-radius: 1rem; }
+        .rounded-l-lg { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; }
+        .rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
         
         .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
         
         .text-center { text-align: center; }
         .text-white { color: #fff; }
-        .text-gray-400 { color: #9ca3af; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
-        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
         .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
         
         .font-bold { font-weight: 700; }
@@ -93,10 +100,6 @@
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
-        
-        .transition-colors { transition-property: color, background-color, border-color, text-decoration-color, fill, stroke; transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1); transition-duration: 150ms; }
-        
-        .hover\:text-white:hover { color: #fff; }
         
         @media (min-width: 640px) {
             .sm\:p-6 { padding: 1.5rem; }
@@ -168,6 +171,23 @@
             filter: invert(1);
             cursor: pointer;
         }
+        /* NEW TALLY BUTTON STYLE */
+        .tally-btn {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.25rem;
+            line-height: 1;
+            color: var(--color-text-muted);
+            background-color: var(--color-surface);
+            padding: 0.5rem 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            border: none;
+        }
+        .tally-btn:hover {
+            color: var(--color-primary);
+            background-color: rgba(255, 59, 48, 0.1);
+        }
     </style>
 </head>
 <body class="antialiased">
@@ -202,17 +222,17 @@
                         <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
                             <label for="newLeads" class="text-sm">New Leads Contacted</label>
                             <div class="flex items-center border border-border rounded-lg">
-                                <button type="button" id="leadsDecrement" class="px-3 py-1 text-lg font-bold text-gray-400 hover:text-white transition-colors">-</button>
+                                <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
                                 <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                <button type="button" id="leadsIncrement" class="px-3 py-1 text-lg font-bold text-gray-400 hover:text-white transition-colors">+</button>
+                                <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
                             </div>
                         </div>
                         <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
                             <label for="estimatesGiven" class="text-sm">Estimates Given</label>
                              <div class="flex items-center border border-border rounded-lg">
-                                <button type="button" id="estimatesDecrement" class="px-3 py-1 text-lg font-bold text-gray-400 hover:text-white transition-colors">-</button>
+                                <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
                                 <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                <button type="button" id="estimatesIncrement" class="px-3 py-1 text-lg font-bold text-gray-400 hover:text-white transition-colors">+</button>
+                                <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
                             </div>
                         </div>
                     </div>
