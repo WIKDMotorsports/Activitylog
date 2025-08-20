@@ -237,6 +237,16 @@
             background-color: rgba(255, 59, 48, 0.1);
         }
         
+        .section-total {
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--color-border);
+            text-align: right;
+            font-weight: 600;
+            font-size: 1.125rem;
+            color: var(--color-text);
+        }
+
         @keyframes gradient-flow {
             0% { background-position: 0% 50%; }
             50% { background-position: 100% 50%; }
@@ -344,6 +354,7 @@
                                 <button class="btn btn-secondary add-btn">+</button>
                             </div>
                             <div class="space-y-2 entry-list"></div>
+                            <div class="section-total"></div>
                         </div>
                         <!-- Sold Cars -->
                         <div class="entry-section" data-section="soldCars">
@@ -357,6 +368,7 @@
                                 <button class="btn btn-secondary add-btn">+</button>
                             </div>
                             <div class="space-y-2 entry-list"></div>
+                            <div class="section-total"></div>
                         </div>
                         <!-- Cars in Shop -->
                         <div class="entry-section" data-section="carsInShop">
@@ -370,6 +382,7 @@
                                 <button class="btn btn-secondary add-btn">+</button>
                             </div>
                             <div class="space-y-2 entry-list"></div>
+                            <div class="section-total"></div>
                         </div>
                         <!-- Social Media -->
                         <div id="socialMediaSection">
@@ -638,6 +651,38 @@
             EXPORT_CSV_BUTTON.onclick = handleExport;
         }
         
+        // --- TOTALS CALCULATION ---
+        function updateSectionTotal(sectionEl) {
+            if (!sectionEl) return;
+            const totalEl = sectionEl.querySelector('.section-total');
+            if (!totalEl) return;
+
+            let total = 0;
+            const items = sectionEl.querySelectorAll('.entry-item');
+            items.forEach(item => {
+                const valueEl = item.querySelector('.value');
+                if (valueEl) {
+                    // Check if we are in edit mode for this item
+                    if (item.classList.contains('is-editing')) {
+                        const valueInput = valueEl.querySelector('input');
+                        if (valueInput) {
+                            total += parseFloat(valueInput.value) || 0;
+                        }
+                    } else {
+                        total += parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g, "")) || 0;
+                    }
+                }
+            });
+
+            totalEl.textContent = `Total: ${total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
+        }
+
+        function updateAllTotals() {
+            document.querySelectorAll('.entry-section[data-section]').forEach(sectionEl => {
+                updateSectionTotal(sectionEl);
+            });
+        }
+
         // --- UNDO FUNCTIONALITY ---
         function getCurrentRangoState() {
             const state = {
@@ -734,6 +779,7 @@
                 if (list) {
                     list.innerHTML = '';
                 }
+                updateSectionTotal(entrySection);
             } else if (socialSection) {
                 const content = socialSection.querySelector('#socialMediaContent');
                 content.querySelectorAll('input').forEach(input => input.value = '');
@@ -772,7 +818,9 @@
             
             item.querySelector('.delete-btn').addEventListener('click', () => {
                 pushStateToHistory();
+                const sectionEl = item.closest('.entry-section');
                 item.remove();
+                updateSectionTotal(sectionEl);
                 saveData();
             });
 
@@ -787,6 +835,7 @@
             }
 
             listEl.appendChild(item);
+            updateSectionTotal(sectionEl);
         }
 
         function toggleEditState(item, saveIcon, editIcon) {
@@ -800,6 +849,7 @@
             const descEl = item.querySelector('.desc');
             const valueEl = item.querySelector('.value');
             const editBtn = item.querySelector('.edit-btn');
+            const sectionEl = item.closest('.entry-section');
 
             if (item.classList.contains('is-editing')) {
                 // Switch to edit mode
@@ -809,6 +859,8 @@
                 descEl.innerHTML = `<input type="text" class="form-element w-full px-2 py-1 text-sm" value="${currentDesc}">`;
                 if (valueEl) {
                     valueEl.innerHTML = `<input type="number" class="form-element w-24 px-2 py-1 text-sm" value="${currentValue}">`;
+                    // Add listener to update total as user types
+                    valueEl.querySelector('input').addEventListener('input', () => updateSectionTotal(sectionEl));
                 }
                 editBtn.innerHTML = saveIcon;
                 editBtn.classList.add('save-btn');
@@ -825,14 +877,15 @@
                 }
                 editBtn.innerHTML = editIcon;
                 editBtn.classList.remove('save-btn');
+                updateSectionTotal(sectionEl);
                 saveData();
             }
         }
 
         function handleMoveEntry(item) {
             pushStateToHistory();
-            const currentSectionEl = item.closest('.entry-section');
-            const currentSectionName = currentSectionEl.dataset.section;
+            const oldSectionEl = item.closest('.entry-section');
+            const currentSectionName = oldSectionEl.dataset.section;
             
             const funnel = {
                 potentialClients: 'soldCars',
@@ -851,6 +904,7 @@
                 
                 renderEntry(targetSectionEl, { desc, value });
                 item.remove();
+                updateSectionTotal(oldSectionEl);
                 saveData();
             }
         }
@@ -873,6 +927,7 @@
                     const userData = data[currentUser];
                     if (userData) populateForm(userData);
                 }
+                updateAllTotals(); // Ensure totals are correct on initial load
             }, (error) => {
                 console.error("Error fetching document: ", error);
                 updateStatus("Error loading data.", true);
@@ -968,6 +1023,7 @@
                 document.getElementById('social_saturday_story').value = sm.saturdayStory || '';
                 document.getElementById('social_sunday_story').value = sm.sundayStory || '';
             }
+            updateAllTotals();
         }
 
         function clearForm() {
@@ -976,6 +1032,7 @@
             document.querySelectorAll('.entry-desc, .entry-value').forEach(input => input.value = '');
             NEW_LEADS_INPUT.value = '0';
             ESTIMATES_GIVEN_INPUT.value = '0';
+            updateAllTotals();
         }
 
         async function handleLiveDieRepeat() {
