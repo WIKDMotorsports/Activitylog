@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Activity Logger</title>
-    <!-- The external Tailwind CSS script has been removed -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Base Variables and Styles */
         :root {
             --color-background: #0A0A0A;
             --color-text: #EAEAEA;
@@ -17,18 +15,12 @@
             --color-primary: #FF3B30;
             --color-surface: #141414;
             --color-border: #2A2A2A;
+            --color-danger: #ef4444;
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
-        
-        /* CSS RESET FOR BOX SIZING - FIX */
-        html {
-          box-sizing: border-box;
-        }
-        *, *:before, *:after {
-          box-sizing: inherit;
-        }
-
+        html { box-sizing: border-box; }
+        *, *:before, *:after { box-sizing: inherit; }
         body {
             font-family: var(--font-body);
             background-color: var(--color-background);
@@ -36,83 +28,55 @@
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
         }
-
-        /* Embedded Tailwind CSS Utility Classes */
         .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
         @media (min-width: 640px) { .container { max-width: 640px; padding-left: 1.5rem; padding-right: 1.5rem; } }
         @media (min-width: 768px) { .container { max-width: 768px; } }
         @media (min-width: 1024px) { .container { max-width: 1024px; padding-left: 2rem; padding-right: 2rem; } }
         @media (min-width: 1280px) { .container { max-width: 1280px; } }
-        
         .max-w-4xl { max-width: 56rem; }
         .mx-auto { margin-left: auto; margin-right: auto; }
         .p-4 { padding: 1rem; }
         .p-8 { padding: 2rem; }
-        .p-3 { padding: 0.75rem; }
         .pt-4 { padding-top: 1rem; }
         .px-4 { padding-left: 1rem; padding-right: 1rem; }
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
-        
         .bg-surface { background-color: var(--color-surface); }
-        .bg-transparent { background-color: transparent; }
-        
         .border { border-width: 1px; }
         .border-border { border-color: var(--color-border); }
         .border-x { border-left-width: 1px; border-right-width: 1px; }
-
         .rounded-lg { border-radius: 0.5rem; }
         .rounded-2xl { border-radius: 1rem; }
         .rounded-l-lg { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; }
         .rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
-        
         .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
-        
         .text-center { text-align: center; }
         .text-white { color: #fff; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
         .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
-        
         .font-bold { font-weight: 700; }
-        
         .uppercase { text-transform: uppercase; }
-        
         .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
         .mb-8 { margin-bottom: 2rem; }
         .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
         .mt-6 { margin-top: 1.5rem; }
-        
         .h-4 { height: 1rem; }
         .w-full { width: 100%; }
         .w-16 { width: 4rem; }
-
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
-        
         .grid { display: grid; }
         .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
-        
         .gap-2 { gap: 0.5rem; }
         .gap-4 { gap: 1rem; }
-        
         .flex { display: flex; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
-        
-        @media (min-width: 640px) {
-            .sm\:p-6 { padding: 1.5rem; }
-            .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-        @media (min-width: 768px) {
-            .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-        }
-        @media (min-width: 1024px) {
-            .lg\:p-8 { padding: 2rem; }
-        }
-
-        /* Custom Component Styles */
+        .flex-grow { flex-grow: 1; }
+        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         .form-element {
             background-color: var(--color-surface);
             border: 1px solid var(--color-border);
@@ -161,17 +125,61 @@
             background-position: right 1rem center;
             background-size: 1em;
         }
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-          -webkit-appearance: none; 
-          margin: 0; 
-        }
-        input[type=number] { -moz-appearance: textfield; }
         input[type="date"]::-webkit-calendar-picker-indicator {
-            filter: invert(1);
             cursor: pointer;
+            filter: brightness(0) saturate(100%) invert(31%) sepia(93%) saturate(3493%) hue-rotate(352deg) brightness(99%) contrast(106%);
         }
-        /* NEW TALLY BUTTON STYLE */
+        .entry-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            background-color: #0A0A0A;
+            padding: 0.5rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--color-border);
+        }
+        .entry-item .desc { flex-grow: 1; }
+        .entry-item .value { color: var(--color-text-muted); font-size: 0.875rem; }
+        .delete-btn {
+            background: none; border: none; color: var(--color-text-muted); cursor: pointer;
+            font-weight: bold; font-size: 1.2rem; line-height: 1;
+            transition: color 0.2s ease;
+        }
+        .delete-btn:hover { color: var(--color-danger); }
+        .add-btn {
+            padding: 0.75rem;
+            font-size: 1.5rem;
+            line-height: 1;
+            font-family: var(--font-body);
+        }
+        .collapsible-content.collapsed {
+            display: none;
+        }
+        #socialMediaToggle.collapsed-state {
+            background-color: #0A0A0A;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+            transition: all 0.2s ease-in-out;
+        }
+        #socialMediaToggle.collapsed-state:hover {
+            border-color: var(--color-primary);
+        }
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: var(--color-surface);
+            padding: 2rem;
+            border-radius: 1rem;
+            border: 1px solid var(--color-border);
+            width: 90%;
+            max-width: 500px;
+        }
+        .hidden { display: none; }
         .tally-btn {
             font-family: var(--font-heading);
             font-weight: 700;
@@ -188,11 +196,48 @@
             color: var(--color-primary);
             background-color: rgba(255, 59, 48, 0.1);
         }
+        
+        @keyframes gradient-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        #liveDieRepeatButton {
+            background: linear-gradient(90deg, #00ffff, #0000ff, #00ffff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            border: none;
+            position: relative;
+            transition: box-shadow 0.3s ease-in-out;
+            background-size: 200% auto;
+            animation: gradient-flow 4s linear infinite;
+        }
+        #liveDieRepeatButton::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 8px;
+            padding: 2px; 
+            background: linear-gradient(90deg, #00ffff, #0000ff, #00ffff);
+            -webkit-mask:
+                linear-gradient(#fff 0 0) content-box,
+                linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+            background-size: 200% auto;
+            animation: gradient-flow 4s linear infinite;
+        }
+        #liveDieRepeatButton:hover {
+            box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.6), 0 0 25px 10px rgba(0, 0, 255, 0.4);
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
+    <div class="container mx-auto max-w-4xl p-4">
         <div class="bg-surface border border-border rounded-2xl shadow-lg p-8">
             <div class="text-center mb-8">
                 <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Daily Activity Logger</h1>
@@ -200,7 +245,8 @@
             </div>
 
             <div class="space-y-6">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- User and Date Selection -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <select id="userSelect" class="form-element w-full px-4 py-3">
                         <option>rango</option>
                         <option>Elyas</option>
@@ -210,52 +256,109 @@
                         <button id="addNameButton" class="btn btn-secondary flex-shrink-0">Add</button>
                     </div>
                 </div>
-                
                 <div>
                     <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
                     <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
                 </div>
-
-                <div id="metricsSection">
-                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Metrics</label>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                            <label for="newLeads" class="text-sm">New Leads Contacted</label>
-                            <div class="flex items-center border border-border rounded-lg">
-                                <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
-                                <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
+                
+                <!-- Rango-specific sections -->
+                <div id="rangoModeSections" class="space-y-6">
+                    <!-- Metrics Section -->
+                    <div id="metricsSection">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                <label for="newLeads" class="text-sm">New Leads Contacted</label>
+                                <div class="flex items-center border border-border rounded-lg">
+                                    <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
+                                    <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                    <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
+                                </div>
                             </div>
-                        </div>
-                        <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                            <label for="estimatesGiven" class="text-sm">Estimates Given</label>
-                             <div class="flex items-center border border-border rounded-lg">
-                                <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
-                                <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
+                            <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                <label for="estimatesGiven" class="text-sm">Estimates Given</label>
+                                 <div class="flex items-center border border-border rounded-lg">
+                                    <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
+                                    <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                    <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <!-- Potential Clients -->
+                    <div class="entry-section" data-section="potentialClients">
+                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Potential Clients</label>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
+                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                            <button class="btn btn-secondary add-btn">+</button>
+                        </div>
+                        <div class="space-y-2 entry-list"></div>
+                    </div>
+                    <!-- Sold Cars -->
+                    <div class="entry-section" data-section="soldCars">
+                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Sold - Car Coming</label>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
+                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                            <button class="btn btn-secondary add-btn">+</button>
+                        </div>
+                        <div class="space-y-2 entry-list"></div>
+                    </div>
+                    <!-- Cars in Shop -->
+                    <div class="entry-section" data-section="carsInShop">
+                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Cars in Shop</label>
+                        <div class="flex gap-2 mb-2">
+                            <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
+                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                            <button class="btn btn-secondary add-btn">+</button>
+                        </div>
+                        <div class="space-y-2 entry-list"></div>
+                    </div>
+                    <!-- Social Media -->
+                    <div id="socialMediaSection">
+                        <div id="socialMediaToggle" class="flex items-center justify-between cursor-pointer">
+                            <div class="flex items-center">
+                                <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
+                                <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
+                            </div>
+                            <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
+                        </div>
+                        <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <input type="text" id="social_story_one" placeholder="Story One" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_story_two" placeholder="Story Two" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_story_three" placeholder="Story Three" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_story_four" placeholder="Story Four" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_reel_1" placeholder="Reel 1" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_saturday_story" placeholder="Saturday Story" class="form-element w-full px-4 py-3 data-field">
+                                <input type="text" id="social_sunday_story" placeholder="Sunday Story" class="form-element w-full px-4 py-3 data-field">
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Live Die Repeat Button -->
+                    <div>
+                        <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
+                    </div>
                 </div>
 
-                <div id="dealsSection">
-                    <label for="open_deals" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Open Deals</label>
-                    <textarea id="open_deals" placeholder="Enter open deals..." rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                <!-- Hourly activities section -->
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Hourly Activities</label>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                    <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                </div>
-
-                <div class="pt-4">
+                <div class="pt-4 flex gap-4">
                      <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
+                     <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
                 </div>
             </div>
 
@@ -263,34 +366,51 @@
         </div>
     </div>
 
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal-overlay hidden">
+        <div class="modal-content space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-white" style="font-family: var(--font-heading);">Export History</h2>
+                <button id="closeExportModalButton" class="text-2xl font-bold" style="color: var(--color-text-muted);">&times;</button>
+            </div>
+            <div>
+                <label for="startDate" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Start Date</label>
+                <input type="date" id="startDate" class="mt-1 block w-full px-4 py-3 form-element">
+            </div>
+            <div>
+                <label for="endDate" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">End Date</label>
+                <input type="date" id="endDate" class="mt-1 block w-full px-4 py-3 form-element">
+            </div>
+            <button id="exportCsvButton" class="btn btn-primary w-full justify-center">Download CSV</button>
+        </div>
+    </div>
+
     <script type="module">
-        // --- Firebase SDK Imports ---
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
 
-        // --- DOM Elements ---
         const USER_SELECT = document.getElementById('userSelect');
-        const ADD_NAME_INPUT = document.getElementById('addNameInput');
         const ADD_NAME_BUTTON = document.getElementById('addNameButton');
         const COPY_SUMMARY_BUTTON = document.getElementById('copySummaryButton');
         const STATUS_MESSAGE = document.getElementById('statusMessage');
-        const METRICS_SECTION = document.getElementById('metricsSection');
-        const DEALS_SECTION = document.getElementById('dealsSection');
-        const OPEN_DEALS_INPUT = document.getElementById('open_deals');
         const LOG_DATE_INPUT = document.getElementById('logDate');
+        const RANGO_SECTIONS = document.getElementById('rangoModeSections');
         const NEW_LEADS_INPUT = document.getElementById('newLeads');
         const ESTIMATES_GIVEN_INPUT = document.getElementById('estimatesGiven');
-        const ALL_DATA_FIELDS = document.querySelectorAll('.data-field, #newLeads, #estimatesGiven, #open_deals');
-
-        // --- App State ---
-        let db, auth;
-        let currentLogUnsubscribe = null; // To detach old Firestore listeners
-        let saveTimeout = null; // To debounce save operations
+        const LIVE_DIE_REPEAT_BUTTON = document.getElementById('liveDieRepeatButton');
         
-        // --- Firebase Initialization and Auth ---
+        // Export Modal Elements
+        const EXPORT_MODAL = document.getElementById('exportModal');
+        const SHOW_EXPORT_MODAL_BUTTON = document.getElementById('showExportModalButton');
+        const CLOSE_EXPORT_MODAL_BUTTON = document.getElementById('closeExportModalButton');
+        const EXPORT_CSV_BUTTON = document.getElementById('exportCsvButton');
+
+        let db, auth;
+        let currentLogUnsubscribe = null;
+        let saveTimeout = null;
+        
         function initializeFirebase() {
-            // Your web app's Firebase configuration
             const firebaseConfig = {
                 apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
                 authDomain: "activity-log-7d4d6.firebaseapp.com",
@@ -300,7 +420,6 @@
                 appId: "1:751457913972:web:ce8972d2aa78c215039521",
                 measurementId: "G-VJEJDWM1NW"
             };
-
             try {
                 const app = initializeApp(firebaseConfig);
                 db = getFirestore(app);
@@ -311,37 +430,39 @@
             }
         }
 
-        // --- Initial Setup on Page Load ---
         window.onload = () => {
             initializeFirebase();
-            
-            // Set date to today in YYYY-MM-DD format
             const today = new Date();
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
-            LOG_DATE_INPUT.value = today.toISOString().slice(0,10);
-
+            const todayStr = today.toISOString().slice(0,10);
+            LOG_DATE_INPUT.value = todayStr;
+            document.getElementById('endDate').value = todayStr; // Default end date for export
+            
             USER_SELECT.value = 'rango';
             handleUserChange();
             setupEventListeners();
             loadDataForCurrentDate();
         };
 
-        // --- Event Handlers Setup ---
         function setupEventListeners() {
             COPY_SUMMARY_BUTTON.onclick = handleCopySummary;
             ADD_NAME_BUTTON.onclick = handleAddName;
+            LIVE_DIE_REPEAT_BUTTON.onclick = handleLiveDieRepeat;
             USER_SELECT.addEventListener('change', () => {
                 handleUserChange();
                 loadDataForCurrentDate();
             });
             LOG_DATE_INPUT.addEventListener('change', loadDataForCurrentDate);
 
-            // Auto-save on input
-            ALL_DATA_FIELDS.forEach(field => {
+            document.querySelectorAll('.data-field, #newLeads, #estimatesGiven').forEach(field => {
                 field.addEventListener('input', () => {
                     clearTimeout(saveTimeout);
-                    saveTimeout = setTimeout(saveData, 1000); // Debounce for 1 second
+                    saveTimeout = setTimeout(saveData, 1000);
                 });
+            });
+
+            document.querySelectorAll('.entry-section .add-btn').forEach(button => {
+                button.addEventListener('click', handleAddEntry);
             });
 
             // Tally buttons
@@ -349,31 +470,89 @@
             document.getElementById('leadsIncrement').onclick = () => { updateTally(NEW_LEADS_INPUT, 1); saveData(); };
             document.getElementById('estimatesDecrement').onclick = () => { updateTally(ESTIMATES_GIVEN_INPUT, -1); saveData(); };
             document.getElementById('estimatesIncrement').onclick = () => { updateTally(ESTIMATES_GIVEN_INPUT, 1); saveData(); };
+
+            // Social Media Collapse Toggle
+            const socialMediaToggle = document.getElementById('socialMediaToggle');
+            const socialMediaContent = document.getElementById('socialMediaContent');
+            const socialMediaIcon = document.getElementById('socialMediaIcon');
+            const expandCue = document.getElementById('expandCue');
+            socialMediaToggle.classList.add('collapsed-state');
+            expandCue.style.display = 'inline';
+            socialMediaToggle.addEventListener('click', () => {
+                const isNowCollapsed = socialMediaContent.classList.toggle('collapsed');
+                socialMediaIcon.innerHTML = isNowCollapsed ? '&#9654;' : '&#9660;';
+                socialMediaToggle.classList.toggle('collapsed-state', isNowCollapsed);
+                expandCue.style.display = isNowCollapsed ? 'inline' : 'none';
+            });
+            
+            // Export Modal Listeners
+            SHOW_EXPORT_MODAL_BUTTON.onclick = () => EXPORT_MODAL.classList.remove('hidden');
+            CLOSE_EXPORT_MODAL_BUTTON.onclick = () => EXPORT_MODAL.classList.add('hidden');
+            EXPORT_CSV_BUTTON.onclick = handleExport;
+        }
+        
+        function updateTally(inputElement, change) {
+            let currentValue = parseInt(inputElement.value, 10) || 0;
+            inputElement.value = Math.max(0, currentValue + change);
         }
 
-        // --- Data Logic (Firestore) ---
-        function loadDataForCurrentDate() {
-            if (currentLogUnsubscribe) {
-                currentLogUnsubscribe(); // Detach the listener for the previous date
-            }
-            clearForm();
+        function handleAddEntry(event) {
+            const sectionEl = event.target.closest('.entry-section');
+            const descInput = sectionEl.querySelector('.entry-desc');
+            const valueInput = sectionEl.querySelector('.entry-value');
+            const desc = descInput.value.trim();
+            
+            if (!desc) return;
 
+            const entryData = { desc };
+            if (valueInput) {
+                entryData.value = parseFloat(valueInput.value) || 0;
+            }
+            
+            renderEntry(sectionEl, entryData);
+            descInput.value = '';
+            if (valueInput) valueInput.value = '';
+            descInput.focus();
+            saveData();
+        }
+
+        function renderEntry(sectionEl, entryData) {
+            const listEl = sectionEl.querySelector('.entry-list');
+            const item = document.createElement('div');
+            item.className = 'entry-item';
+            
+            let valueHtml = '';
+            if (typeof entryData.value !== 'undefined') {
+                valueHtml = `<span class="value">${entryData.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
+            }
+
+            item.innerHTML = `
+                <span class="desc">${entryData.desc}</span>
+                ${valueHtml}
+                <button class="delete-btn">&times;</button>
+            `;
+            
+            item.querySelector('.delete-btn').addEventListener('click', () => {
+                item.remove();
+                saveData();
+            });
+
+            listEl.appendChild(item);
+        }
+
+        function loadDataForCurrentDate() {
+            if (currentLogUnsubscribe) currentLogUnsubscribe();
             const dateId = LOG_DATE_INPUT.value;
             if (!dateId || !db) return;
             
             const docRef = doc(db, "activity_logs", dateId);
-
             currentLogUnsubscribe = onSnapshot(docRef, (docSnap) => {
+                clearForm(); // Clear the form before populating
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const currentUser = USER_SELECT.value;
                     const userData = data[currentUser];
-                    if (userData) {
-                        populateForm(userData);
-                    }
-                } else {
-                    // If the document doesn't exist, clear the form for a new entry
-                    clearForm();
+                    if (userData) populateForm(userData);
                 }
             }, (error) => {
                 console.error("Error fetching document: ", error);
@@ -402,11 +581,34 @@
             };
 
             if (currentUser !== 'Elyas') {
-                dataToSave.metrics = {
-                    newLeads: NEW_LEADS_INPUT.value,
-                    estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
-                    openDeals: OPEN_DEALS_INPUT.value
+                dataToSave.rangoData = {
+                    metrics: {
+                        newLeads: NEW_LEADS_INPUT.value,
+                        estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
+                    },
+                    socialMedia: {
+                        storyOne: document.getElementById('social_story_one').value,
+                        storyTwo: document.getElementById('social_story_two').value,
+                        storyThree: document.getElementById('social_story_three').value,
+                        storyFour: document.getElementById('social_story_four').value,
+                        reel1: document.getElementById('social_reel_1').value,
+                        saturdayStory: document.getElementById('social_saturday_story').value,
+                        sundayStory: document.getElementById('social_sunday_story').value,
+                    }
                 };
+                document.querySelectorAll('.entry-section').forEach(sectionEl => {
+                    const sectionName = sectionEl.dataset.section;
+                    dataToSave.rangoData[sectionName] = [];
+                    sectionEl.querySelectorAll('.entry-item').forEach(itemEl => {
+                        const desc = itemEl.querySelector('.desc').textContent;
+                        const valueEl = itemEl.querySelector('.value');
+                        const entry = { desc };
+                        if (valueEl) {
+                           entry.value = parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,""));
+                        }
+                        dataToSave.rangoData[sectionName].push(entry);
+                    });
+                });
             }
 
             try {
@@ -419,15 +621,13 @@
             }
         }
 
-        // --- UI & Form Logic ---
         function handleUserChange() {
             const isElyas = USER_SELECT.value === 'Elyas';
-            METRICS_SECTION.style.display = isElyas ? 'none' : 'block';
-            DEALS_SECTION.style.display = isElyas ? 'none' : 'block';
+            RANGO_SECTIONS.style.display = isElyas ? 'none' : 'block';
         }
 
         function handleAddName() {
-            const newName = ADD_NAME_INPUT.value.trim();
+            const newName = document.getElementById('addNameInput').value.trim();
             if (newName) {
                 if (![...USER_SELECT.options].some(opt => opt.value === newName)) {
                     const option = document.createElement('option');
@@ -436,90 +636,273 @@
                     USER_SELECT.appendChild(option);
                 }
                 USER_SELECT.value = newName;
-                ADD_NAME_INPUT.value = '';
+                document.getElementById('addNameInput').value = '';
                 handleUserChange();
                 loadDataForCurrentDate();
             }
         }
-
-        function updateTally(inputElement, change) {
-            let currentValue = parseInt(inputElement.value, 10) || 0;
-            inputElement.value = Math.max(0, currentValue + change);
-        }
         
         function populateForm(userData) {
-            for (const key in userData.activities) {
-                const element = document.getElementById(`activity_${key.replace('-', '_')}`);
-                if (element) element.value = userData.activities[key];
+            if (userData.activities) {
+                for (const key in userData.activities) {
+                    const element = document.getElementById(`activity_${key.replace('-', '_')}`);
+                    if (element) element.value = userData.activities[key] || '';
+                }
             }
-            if (userData.metrics) {
-                NEW_LEADS_INPUT.value = userData.metrics.newLeads || 0;
-                ESTIMATES_GIVEN_INPUT.value = userData.metrics.estimatesGiven || 0;
-                OPEN_DEALS_INPUT.value = userData.metrics.openDeals || '';
+            if (userData.rangoData) {
+                populateRangoData(userData.rangoData);
+            }
+        }
+
+        function populateRangoData(rangoData) {
+            if (rangoData.metrics) {
+                NEW_LEADS_INPUT.value = rangoData.metrics.newLeads || '0';
+                ESTIMATES_GIVEN_INPUT.value = rangoData.metrics.estimatesGiven || '0';
+            }
+            ['potentialClients', 'soldCars', 'carsInShop'].forEach(sectionName => {
+                const sectionEl = document.querySelector(`.entry-section[data-section="${sectionName}"]`);
+                if (sectionEl && Array.isArray(rangoData[sectionName])) {
+                    sectionEl.querySelector('.entry-list').innerHTML = ''; // Clear existing entries
+                    rangoData[sectionName].forEach(entry => renderEntry(sectionEl, entry));
+                }
+            });
+            if (rangoData.socialMedia) {
+                const sm = rangoData.socialMedia;
+                document.getElementById('social_story_one').value = sm.storyOne || '';
+                document.getElementById('social_story_two').value = sm.storyTwo || '';
+                document.getElementById('social_story_three').value = sm.storyThree || '';
+                document.getElementById('social_story_four').value = sm.storyFour || '';
+                document.getElementById('social_reel_1').value = sm.reel1 || '';
+                document.getElementById('social_saturday_story').value = sm.saturdayStory || '';
+                document.getElementById('social_sunday_story').value = sm.sundayStory || '';
             }
         }
 
         function clearForm() {
-            ALL_DATA_FIELDS.forEach(field => {
-                if (field.type === 'number') {
-                    field.value = '0';
-                } else if (field.tagName === 'TEXTAREA') {
-                    field.value = '';
+            document.querySelectorAll('.data-field').forEach(field => field.value = '');
+            document.querySelectorAll('.entry-list').forEach(list => list.innerHTML = '');
+            document.querySelectorAll('.entry-desc, .entry-value').forEach(input => input.value = '');
+            NEW_LEADS_INPUT.value = '0';
+            ESTIMATES_GIVEN_INPUT.value = '0';
+        }
+
+        async function handleLiveDieRepeat() {
+            const currentDateStr = LOG_DATE_INPUT.value;
+            const currentDate = new Date(currentDateStr + 'T12:00:00'); // Use noon to avoid timezone issues
+            currentDate.setDate(currentDate.getDate() - 1);
+            const prevDateStr = currentDate.toISOString().slice(0, 10);
+            
+            const currentUser = USER_SELECT.value;
+            if (!currentUser || !db) return;
+
+            updateStatus('Loading yesterday\'s data...', false, true);
+
+            try {
+                const docRef = doc(db, "activity_logs", prevDateStr);
+                const docSnap = await getDoc(docRef);
+
+                if (docSnap.exists()) {
+                    const data = docSnap.data();
+                    const userData = data[currentUser];
+                    if (userData && userData.rangoData) {
+                        populateRangoData(userData.rangoData);
+                        await saveData(); // Save the copied data to the current day
+                        updateStatus('Yesterday\'s data copied and saved!', false);
+                    } else {
+                        updateStatus(`No data found for ${currentUser} on ${prevDateStr}.`, false);
+                    }
+                } else {
+                    updateStatus(`No log found for yesterday (${prevDateStr}).`, false);
                 }
-            });
+            } catch (error) {
+                console.error("Error in Live, Die, Repeat:", error);
+                updateStatus('Failed to load yesterday\'s data.', true);
+            }
         }
 
         function handleCopySummary() {
-            const data = {
-                date: new Date(LOG_DATE_INPUT.value + 'T00:00:00').toLocaleDateString(), // Format date nicely
-                userName: USER_SELECT.value,
-                newLeads: NEW_LEADS_INPUT.value,
-                estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
-                openDeals: OPEN_DEALS_INPUT.value,
-                activities: {
-                    '8-9': document.getElementById('activity_8_9').value, '9-10': document.getElementById('activity_9_10').value,
-                    '10-11': document.getElementById('activity_10_11').value, '11-12': document.getElementById('activity_11_12').value,
-                    '1-2': document.getElementById('activity_1_2').value, '2-3': document.getElementById('activity_2_3').value,
-                    '3-4': document.getElementById('activity_3_4').value, '4-5': document.getElementById('activity_4_5').value
-                }
-            };
+            const userName = USER_SELECT.value;
+            const date = new Date(LOG_DATE_INPUT.value + 'T00:00:00').toLocaleDateString();
+            let message = `*${userName.toUpperCase()} - DAILY REPORT for ${date}*\n\n`;
 
-            let message = `*Daily Activity Log for ${data.userName} on ${data.date}*\n\n`;
-            message += "```\nTime      | Activity\n----------|----------------------------------\n";
-            message += `8am-9am   | ${data.activities['8-9'] || ''}\n`;
-            message += `9am-10am  | ${data.activities['9-10'] || ''}\n`;
-            message += `10am-11am | ${data.activities['10-11'] || ''}\n`;
-            message += `11am-12pm | ${data.activities['11-12'] || ''}\n`;
-            message += `1pm-2pm   | ${data.activities['1-2'] || ''}\n`;
-            message += `2pm-3pm   | ${data.activities['2-3'] || ''}\n`;
-            message += `3pm-4pm   | ${data.activities['3-4'] || ''}\n`;
-            message += `4pm-5pm   | ${data.activities['4-5'] || ''}\n`;
-            message += "```";
+            if (userName !== 'Elyas') {
+                message += `*METRICS*\n`;
+                message += `- New Leads Contacted: ${NEW_LEADS_INPUT.value}\n`;
+                message += `- Estimates Given: ${ESTIMATES_GIVEN_INPUT.value}\n\n`;
+            }
+
+            message += `*HOURLY ACTIVITIES*\n`;
+            const activities = [
+                { label: '8-9am', value: document.getElementById('activity_8_9').value.trim() },
+                { label: '9-10am', value: document.getElementById('activity_9_10').value.trim() },
+                { label: '10-11am', value: document.getElementById('activity_10_11').value.trim() },
+                { label: '11am-12pm', value: document.getElementById('activity_11_12').value.trim() },
+                { label: '1-2pm', value: document.getElementById('activity_1_2').value.trim() },
+                { label: '2-3pm', value: document.getElementById('activity_2_3').value.trim() },
+                { label: '3-4pm', value: document.getElementById('activity_3_4').value.trim() },
+                { label: '4-5pm', value: document.getElementById('activity_4_5').value.trim() }
+            ];
+            activities.forEach(act => {
+                if (act.value) message += `- ${act.label}: ${act.value}\n`;
+            });
+            message += '\n';
             
-            if (data.userName !== 'Elyas') {
-                message += `\n\n--- Tallies & Deals ---\n`;
-                message += `New Leads Contacted: ${data.newLeads}\n`;
-                message += `Estimates Given: ${data.estimatesGiven}\n`;
-                if(data.openDeals) {
-                    message += `Open Deals: ${data.openDeals}`;
+            if (userName !== 'Elyas') {
+                const processEntrySection = (sectionEl, title) => {
+                    const items = sectionEl.querySelectorAll('.entry-item');
+                    if (items.length === 0) return '';
+                    let content = `*${title}*\n`;
+                    let total = 0;
+                    items.forEach(item => {
+                        const desc = item.querySelector('.desc').textContent;
+                        const valueEl = item.querySelector('.value');
+                        const value = parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,""));
+                        total += value;
+                        content += `- ${desc} (${value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })})\n`;
+                    });
+                    content += `*Total: ${total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}*\n\n`;
+                    return content;
+                };
+                message += processEntrySection(document.querySelector('[data-section="potentialClients"]'), 'POTENTIAL CLIENTS');
+                message += processEntrySection(document.querySelector('[data-section="soldCars"]'), 'SOLD - CAR COMING');
+                message += processEntrySection(document.querySelector('[data-section="carsInShop"]'), 'CARS IN SHOP');
+                
+                const socialMediaFields = [
+                    { label: 'STORY ONE', value: document.getElementById('social_story_one').value.trim() },
+                    { label: 'STORY TWO', value: document.getElementById('social_story_two').value.trim() },
+                    { label: 'STORY THREE', value: document.getElementById('social_story_three').value.trim() },
+                    { label: 'STORY FOUR', value: document.getElementById('social_story_four').value.trim() },
+                    { label: 'REEL 1', value: document.getElementById('social_reel_1').value.trim() },
+                    { label: 'SATURDAY STORY', value: document.getElementById('social_saturday_story').value.trim() },
+                    { label: 'SUNDAY STORY', value: document.getElementById('social_sunday_story').value.trim() },
+                ];
+                const filledSocialMedia = socialMediaFields.filter(field => field.value);
+                if (filledSocialMedia.length > 0) {
+                    message += `*SOCIAL MEDIA*\n`;
+                    filledSocialMedia.forEach(field => {
+                        message += `- ${field.label}: ${field.value}\n`;
+                    });
+                    message += "\n";
                 }
             }
 
-            navigator.clipboard.writeText(message).then(() => {
-                updateStatus('Summary copied to clipboard!', false);
-            }).catch(err => {
+            const textArea = document.createElement("textarea");
+            textArea.value = message;
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            textArea.style.position = "fixed";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                const successful = document.execCommand('copy');
+                if (successful) {
+                    updateStatus('Summary copied to clipboard!', false);
+                } else {
+                    updateStatus('Failed to copy.', true);
+                }
+            } catch (err) {
                 updateStatus('Failed to copy.', true);
                 console.error('Clipboard error:', err);
-            });
+            }
+            document.body.removeChild(textArea);
         }
         
+        async function handleExport() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate) {
+                updateStatus('Please select a start and end date.', true);
+                return;
+            }
+            if (startDate > endDate) {
+                updateStatus('Start date cannot be after end date.', true);
+                return;
+            }
+
+            updateStatus('Exporting...', false, true);
+            
+            try {
+                const logsRef = collection(db, 'activity_logs');
+                const q = query(logsRef, where(documentId(), '>=', startDate), where(documentId(), '<=', endDate));
+                const querySnapshot = await getDocs(q);
+
+                if (querySnapshot.empty) {
+                    updateStatus('No data found for the selected range.', false);
+                    return;
+                }
+                
+                let csvContent = "Date,User,Category,Item,Description,Value\n";
+                
+                const escapeCsvCell = (cell) => {
+                    if (cell === undefined || cell === null) return '';
+                    const str = String(cell);
+                    if (str.includes(',')) return `"${str.replace(/"/g, '""')}"`;
+                    return str;
+                };
+
+                querySnapshot.forEach(doc => {
+                    const date = doc.id;
+                    const data = doc.data();
+                    
+                    for (const user in data) {
+                        const log = data[user];
+                        
+                        if (log.activities) {
+                            for(const time in log.activities) {
+                                if(log.activities[time]) {
+                                    csvContent += `${date},${user},Hourly Activity,${time},${escapeCsvCell(log.activities[time])},\n`;
+                                }
+                            }
+                        }
+                        
+                        if (log.rangoData) {
+                            const rd = log.rangoData;
+                            if (rd.metrics) {
+                                csvContent += `${date},${user},Metric,New Leads Contacted,,${rd.metrics.newLeads || 0}\n`;
+                                csvContent += `${date},${user},Metric,Estimates Given,,${rd.metrics.estimatesGiven || 0}\n`;
+                            }
+                            if (rd.potentialClients) rd.potentialClients.forEach(item => csvContent += `${date},${user},Potential Client,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
+                            if (rd.soldCars) rd.soldCars.forEach(item => csvContent += `${date},${user},Sold - Car Coming,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
+                            if (rd.carsInShop) rd.carsInShop.forEach(item => csvContent += `${date},${user},Cars in Shop,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
+                            if (rd.socialMedia) {
+                                for(const item in rd.socialMedia) {
+                                    if(rd.socialMedia[item]) {
+                                        csvContent += `${date},${user},Social Media,${escapeCsvCell(item)},${escapeCsvCell(rd.socialMedia[item])},\n`;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                const link = document.createElement("a");
+                const url = URL.createObjectURL(blob);
+                link.setAttribute("href", url);
+                link.setAttribute("download", `activity_log_${startDate}_to_${endDate}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+
+                updateStatus('Export successful!', false);
+                EXPORT_MODAL.classList.add('hidden');
+
+            } catch (error) {
+                console.error("Error exporting data: ", error);
+                updateStatus('Export failed.', true);
+            }
+        }
+
         let statusTimeout;
         function updateStatus(message, isError, persistent = false) {
             clearTimeout(statusTimeout);
             STATUS_MESSAGE.textContent = message;
             STATUS_MESSAGE.style.color = isError ? '#FF3B30' : '#34D399';
             if (!persistent) {
-                statusTimeout = setTimeout(() => STATUS_MESSAGE.textContent = '', 2000);
+                statusTimeout = setTimeout(() => STATUS_MESSAGE.textContent = '', 3000);
             }
         }
     </script>
