@@ -16,6 +16,7 @@
             --color-surface: #141414;
             --color-border: #2A2A2A;
             --color-danger: #ef4444;
+            --color-success: #34d399;
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
@@ -100,12 +101,18 @@
             transition: all 0.3s ease;
             cursor: pointer;
         }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
         .btn-primary {
             background-color: var(--color-primary);
             color: white;
             border: 1px solid var(--color-primary);
         }
-        .btn-primary:hover {
+        .btn-primary:hover:not(:disabled) {
             background-color: #E03024;
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
@@ -115,12 +122,28 @@
             color: var(--color-primary);
             border: 1px solid var(--color-primary);
         }
-        .btn-secondary:hover { background-color: rgba(255, 59, 48, 0.1); }
+        .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
+        .btn-clear-section {
+            background: none;
+            border: none;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 0.75rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+        }
+        .btn-clear-section:hover {
+            color: var(--color-danger);
+            background-color: rgba(239, 68, 68, 0.1);
+        }
         select {
             -webkit-appearance: none;
             -moz-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a1a1aa' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a1a1aa' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 1rem center;
             background-size: 1em;
@@ -147,14 +170,22 @@
             border-radius: 6px;
             border: 1px solid var(--color-border);
         }
+        .entry-item .desc, .entry-item .value {
+            transition: all 0.2s ease;
+        }
         .entry-item .desc { flex-grow: 1; }
         .entry-item .value { color: var(--color-text-muted); font-size: 0.875rem; }
-        .delete-btn {
+        .entry-item-actions { display: flex; align-items: center; gap: 0.5rem; }
+        .entry-item-btn {
             background: none; border: none; color: var(--color-text-muted); cursor: pointer;
-            font-weight: bold; font-size: 1.2rem; line-height: 1;
+            padding: 0.25rem; line-height: 1;
             transition: color 0.2s ease;
         }
-        .delete-btn:hover { color: var(--color-danger); }
+        .entry-item-btn svg { width: 16px; height: 16px; }
+        .entry-item-btn:hover { color: var(--color-primary); }
+        .entry-item-btn.delete-btn:hover { color: var(--color-danger); }
+        .entry-item-btn.save-btn:hover { color: var(--color-success); }
+        
         .add-btn {
             padding: 0.75rem;
             font-size: 1.5rem;
@@ -239,7 +270,7 @@
             background-size: 200% auto;
             animation: gradient-flow 4s linear infinite;
         }
-        #liveDieRepeatButton:hover {
+        #liveDieRepeatButton:hover:not(:disabled) {
             box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.6), 0 0 25px 10px rgba(0, 0, 255, 0.4);
         }
 
@@ -293,7 +324,7 @@
                                 </div>
                                 <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
                                     <label for="estimatesGiven" class="text-sm">Estimates Given</label>
-                                     <div class="flex items-center border border-border rounded-lg">
+                                    <div class="flex items-center border border-border rounded-lg">
                                         <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
                                         <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
                                         <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
@@ -303,7 +334,10 @@
                         </div>
                         <!-- Potential Clients -->
                         <div class="entry-section" data-section="potentialClients">
-                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Potential Clients</label>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Potential Clients</label>
+                                <button type="button" class="btn-clear-section">Clear All</button>
+                            </div>
                             <div class="flex gap-2 mb-2">
                                 <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
                                 <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
@@ -313,7 +347,10 @@
                         </div>
                         <!-- Sold Cars -->
                         <div class="entry-section" data-section="soldCars">
-                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Sold - Car Coming</label>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Sold - Car Coming</label>
+                                <button type="button" class="btn-clear-section">Clear All</button>
+                            </div>
                             <div class="flex gap-2 mb-2">
                                 <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
                                 <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
@@ -323,7 +360,10 @@
                         </div>
                         <!-- Cars in Shop -->
                         <div class="entry-section" data-section="carsInShop">
-                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Cars in Shop</label>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Cars in Shop</label>
+                                <button type="button" class="btn-clear-section">Clear All</button>
+                            </div>
                             <div class="flex gap-2 mb-2">
                                 <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
                                 <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
@@ -338,7 +378,10 @@
                                     <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
                                     <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
                                 </div>
-                                <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
+                                <div class="flex items-center gap-4">
+                                    <button type="button" class="btn-clear-section hidden">Clear All</button>
+                                    <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
+                                </div>
                             </div>
                             <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
                                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -352,8 +395,9 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Live Die Repeat Button -->
-                        <div>
+                        <!-- Action Buttons -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <button id="undoButton" class="btn btn-secondary w-full justify-center" disabled>Undo Last Edit</button>
                             <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
                         </div>
                     </div>
@@ -389,11 +433,11 @@
         <div class="modal-content space-y-6">
              <h2 class="text-2xl font-bold text-white text-center" style="font-family: var(--font-heading);">Enter 4-Digit PIN</h2>
              <div>
-                <input type="number" id="pinInput" class="form-element w-full px-4 py-3" maxlength="4" oninput="this.value=this.value.slice(0,this.maxLength)">
+                 <input type="number" id="pinInput" class="form-element w-full px-4 py-3" maxlength="4" oninput="this.value=this.value.slice(0,this.maxLength)">
              </div>
              <div class="flex items-center justify-center gap-2">
-                <input type="checkbox" id="rememberDevice" class="form-element" style="width: 1rem; height: 1rem;">
-                <label for="rememberDevice" class="text-sm" style="color: var(--color-text-muted);">Remember this device</label>
+                 <input type="checkbox" id="rememberDevice" class="form-element" style="width: 1rem; height: 1rem;">
+                 <label for="rememberDevice" class="text-sm" style="color: var(--color-text-muted);">Remember this device</label>
              </div>
              <p id="pinError" class="text-center h-4" style="color: var(--color-danger);"></p>
         </div>
@@ -419,9 +463,9 @@
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-app.js";
-        import { getAuth } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-auth.js";
-        import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
         const USER_SELECT = document.getElementById('userSelect');
         const ADD_NAME_BUTTON = document.getElementById('addNameButton');
@@ -432,6 +476,7 @@
         const NEW_LEADS_INPUT = document.getElementById('newLeads');
         const ESTIMATES_GIVEN_INPUT = document.getElementById('estimatesGiven');
         const LIVE_DIE_REPEAT_BUTTON = document.getElementById('liveDieRepeatButton');
+        const UNDO_BUTTON = document.getElementById('undoButton');
         
         // Modal Elements
         const EXPORT_MODAL = document.getElementById('exportModal');
@@ -447,6 +492,10 @@
         let db, auth;
         let currentLogUnsubscribe = null;
         let saveTimeout = null;
+        
+        // Undo functionality state
+        let historyStack = [];
+        const MAX_HISTORY_SIZE = 20;
         
         function initializeFirebase() {
             const firebaseConfig = {
@@ -526,13 +575,17 @@
             COPY_SUMMARY_BUTTON.onclick = handleCopySummary;
             ADD_NAME_BUTTON.onclick = handleAddName;
             LIVE_DIE_REPEAT_BUTTON.onclick = handleLiveDieRepeat;
+            UNDO_BUTTON.onclick = handleUndo;
+
             USER_SELECT.addEventListener('change', () => {
                 handleUserChange();
                 loadDataForCurrentDate();
             });
             LOG_DATE_INPUT.addEventListener('change', loadDataForCurrentDate);
 
+            // Debounced save for text fields
             document.querySelectorAll('.data-field, #newLeads, #estimatesGiven').forEach(field => {
+                field.addEventListener('focus', pushStateToHistory);
                 field.addEventListener('input', () => {
                     clearTimeout(saveTimeout);
                     saveTimeout = setTimeout(saveData, 1000);
@@ -543,11 +596,22 @@
                 button.addEventListener('click', handleAddEntry);
             });
 
+            document.querySelectorAll('.btn-clear-section').forEach(button => {
+                button.addEventListener('click', handleClearSection);
+            });
+
             // Tally buttons
-            document.getElementById('leadsDecrement').onclick = () => { updateTally(NEW_LEADS_INPUT, -1); saveData(); };
-            document.getElementById('leadsIncrement').onclick = () => { updateTally(NEW_LEADS_INPUT, 1); saveData(); };
-            document.getElementById('estimatesDecrement').onclick = () => { updateTally(ESTIMATES_GIVEN_INPUT, -1); saveData(); };
-            document.getElementById('estimatesIncrement').onclick = () => { updateTally(ESTIMATES_GIVEN_INPUT, 1); saveData(); };
+            const setupTallyButton = (id, inputEl, change) => {
+                document.getElementById(id).onclick = () => {
+                    pushStateToHistory();
+                    updateTally(inputEl, change);
+                    saveData();
+                };
+            };
+            setupTallyButton('leadsDecrement', NEW_LEADS_INPUT, -1);
+            setupTallyButton('leadsIncrement', NEW_LEADS_INPUT, 1);
+            setupTallyButton('estimatesDecrement', ESTIMATES_GIVEN_INPUT, -1);
+            setupTallyButton('estimatesIncrement', ESTIMATES_GIVEN_INPUT, 1);
 
             // Social Media Collapse Toggle
             const socialMediaToggle = document.getElementById('socialMediaToggle');
@@ -561,6 +625,11 @@
                 socialMediaIcon.innerHTML = isNowCollapsed ? '&#9654;' : '&#9660;';
                 socialMediaToggle.classList.toggle('collapsed-state', isNowCollapsed);
                 expandCue.style.display = isNowCollapsed ? 'inline' : 'none';
+                
+                const clearBtn = document.querySelector('#socialMediaSection .btn-clear-section');
+                if (clearBtn) {
+                    clearBtn.classList.toggle('hidden', isNowCollapsed);
+                }
             });
             
             // Export Modal Listeners
@@ -569,12 +638,72 @@
             EXPORT_CSV_BUTTON.onclick = handleExport;
         }
         
+        // --- UNDO FUNCTIONALITY ---
+        function getCurrentRangoState() {
+            const state = {
+                metrics: {
+                    newLeads: NEW_LEADS_INPUT.value,
+                    estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
+                },
+                socialMedia: {
+                    storyOne: document.getElementById('social_story_one').value,
+                    storyTwo: document.getElementById('social_story_two').value,
+                    storyThree: document.getElementById('social_story_three').value,
+                    storyFour: document.getElementById('social_story_four').value,
+                    reel1: document.getElementById('social_reel_1').value,
+                    saturdayStory: document.getElementById('social_saturday_story').value,
+                    sundayStory: document.getElementById('social_sunday_story').value,
+                }
+            };
+            document.querySelectorAll('.entry-section').forEach(sectionEl => {
+                const sectionName = sectionEl.dataset.section;
+                state[sectionName] = [];
+                sectionEl.querySelectorAll('.entry-item').forEach(itemEl => {
+                    const desc = itemEl.querySelector('.desc').textContent;
+                    const valueEl = itemEl.querySelector('.value');
+                    const entry = { desc };
+                    if (valueEl) {
+                        entry.value = parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,""));
+                    }
+                    state[sectionName].push(entry);
+                });
+            });
+            return state;
+        }
+
+        function pushStateToHistory() {
+            if (USER_SELECT.value === 'Elyas') return; // Only track history for rango mode
+            
+            const currentState = getCurrentRangoState();
+            historyStack.push(currentState);
+            if (historyStack.length > MAX_HISTORY_SIZE) {
+                historyStack.shift(); // Keep history size manageable
+            }
+            UNDO_BUTTON.disabled = false;
+        }
+
+        function handleUndo() {
+            if (historyStack.length === 0) {
+                updateStatus('Nothing to undo.', false);
+                return;
+            }
+            const previousState = historyStack.pop();
+            populateRangoData(previousState);
+            saveData(); // Save the restored state
+            updateStatus('Undo successful.', false);
+            if (historyStack.length === 0) {
+                UNDO_BUTTON.disabled = true;
+            }
+        }
+        // --- END UNDO FUNCTIONALITY ---
+
         function updateTally(inputElement, change) {
             let currentValue = parseInt(inputElement.value, 10) || 0;
             inputElement.value = Math.max(0, currentValue + change);
         }
 
         function handleAddEntry(event) {
+            pushStateToHistory();
             const sectionEl = event.target.closest('.entry-section');
             const descInput = sectionEl.querySelector('.entry-desc');
             const valueInput = sectionEl.querySelector('.entry-value');
@@ -593,6 +722,25 @@
             descInput.focus();
             saveData();
         }
+        
+        function handleClearSection(event) {
+            pushStateToHistory();
+            const button = event.target;
+            const entrySection = button.closest('.entry-section');
+            const socialSection = button.closest('#socialMediaSection');
+
+            if (entrySection) {
+                const list = entrySection.querySelector('.entry-list');
+                if (list) {
+                    list.innerHTML = '';
+                }
+            } else if (socialSection) {
+                const content = socialSection.querySelector('#socialMediaContent');
+                content.querySelectorAll('input').forEach(input => input.value = '');
+            }
+            
+            saveData();
+        }
 
         function renderEntry(sectionEl, entryData) {
             const listEl = sectionEl.querySelector('.entry-list');
@@ -604,18 +752,107 @@
                 valueHtml = `<span class="value">${entryData.value.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</span>`;
             }
 
+            const editIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M12.854.146a.5.5 0 0 0-.707 0L10.5 1.793 14.207 5.5l1.647-1.646a.5.5 0 0 0 0-.708l-3-3zm.646 6.061L9.793 2.5 3.293 9H3.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.207l6.5-6.5zm-7.468 7.468A.5.5 0 0 1 6 13.5V13h-.5a.5.5 0 0 1-.5-.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.5-.5V10h-.5a.499.499 0 0 1-.175-.032l-.179.178a.5.5 0 0 0-.11.168l-2 5a.5.5 0 0 0 .65.65l5-2a.5.5 0 0 0 .168-.11l.178-.178z"/></svg>`;
+            const saveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M10.97 4.97a.75.75 0 0 1 1.07 1.05l-3.99 4.99a.75.75 0 0 1-1.08.02L4.324 8.384a.75.75 0 1 1 1.06-1.06l2.094 2.093 3.473-4.425a.267.267 0 0 1 .02-.022z"/></svg>`;
+            const moveIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path fill-rule="evenodd" d="M8 1a.5.5 0 0 1 .5.5v11.793l3.146-3.147a.5.5 0 0 1 .708.708l-4 4a.5.5 0 0 1-.708 0l-4-4a.5.5 0 0 1 .708-.708L7.5 13.293V1.5A.5.5 0 0 1 8 1z"/></svg>`;
+            const deleteIcon = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/></svg>`;
+
+            const sectionName = sectionEl.dataset.section;
+            const canMove = sectionName === 'potentialClients' || sectionName === 'soldCars';
+
             item.innerHTML = `
-                <span class="desc">${entryData.desc}</span>
+                <div class="desc">${entryData.desc}</div>
                 ${valueHtml}
-                <button class="delete-btn">&times;</button>
+                <div class="entry-item-actions">
+                    <button class="entry-item-btn edit-btn">${editIcon}</button>
+                    ${canMove ? `<button class="entry-item-btn move-btn">${moveIcon}</button>` : ''}
+                    <button class="entry-item-btn delete-btn">${deleteIcon}</button>
+                </div>
             `;
             
             item.querySelector('.delete-btn').addEventListener('click', () => {
+                pushStateToHistory();
                 item.remove();
                 saveData();
             });
 
+            item.querySelector('.edit-btn').addEventListener('click', (e) => {
+                toggleEditState(e.currentTarget.closest('.entry-item'), saveIcon, editIcon);
+            });
+
+            if (canMove) {
+                item.querySelector('.move-btn').addEventListener('click', (e) => {
+                    handleMoveEntry(e.currentTarget.closest('.entry-item'));
+                });
+            }
+
             listEl.appendChild(item);
+        }
+
+        function toggleEditState(item, saveIcon, editIcon) {
+            const isEditing = item.classList.contains('is-editing');
+            
+            if (!isEditing) { // Before entering edit mode
+                pushStateToHistory();
+            }
+
+            item.classList.toggle('is-editing');
+            const descEl = item.querySelector('.desc');
+            const valueEl = item.querySelector('.value');
+            const editBtn = item.querySelector('.edit-btn');
+
+            if (item.classList.contains('is-editing')) {
+                // Switch to edit mode
+                const currentDesc = descEl.textContent;
+                const currentValue = valueEl ? parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,"")) : '';
+                
+                descEl.innerHTML = `<input type="text" class="form-element w-full px-2 py-1 text-sm" value="${currentDesc}">`;
+                if (valueEl) {
+                    valueEl.innerHTML = `<input type="number" class="form-element w-24 px-2 py-1 text-sm" value="${currentValue}">`;
+                }
+                editBtn.innerHTML = saveIcon;
+                editBtn.classList.add('save-btn');
+
+            } else {
+                // Switch back to view mode
+                const newDesc = descEl.querySelector('input').value;
+                const newValueInput = valueEl ? valueEl.querySelector('input') : null;
+                
+                descEl.textContent = newDesc;
+                if (valueEl && newValueInput) {
+                    const newValue = parseFloat(newValueInput.value) || 0;
+                    valueEl.textContent = newValue.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+                }
+                editBtn.innerHTML = editIcon;
+                editBtn.classList.remove('save-btn');
+                saveData();
+            }
+        }
+
+        function handleMoveEntry(item) {
+            pushStateToHistory();
+            const currentSectionEl = item.closest('.entry-section');
+            const currentSectionName = currentSectionEl.dataset.section;
+            
+            const funnel = {
+                potentialClients: 'soldCars',
+                soldCars: 'carsInShop'
+            };
+
+            const targetSectionName = funnel[currentSectionName];
+            if (!targetSectionName) return;
+
+            const targetSectionEl = document.querySelector(`.entry-section[data-section="${targetSectionName}"]`);
+
+            if (targetSectionEl) {
+                const desc = item.querySelector('.desc').textContent;
+                const valueEl = item.querySelector('.value');
+                const value = valueEl ? parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,"")) : 0;
+                
+                renderEntry(targetSectionEl, { desc, value });
+                item.remove();
+                saveData();
+            }
         }
 
         function loadDataForCurrentDate() {
@@ -623,9 +860,13 @@
             const dateId = LOG_DATE_INPUT.value;
             if (!dateId || !db) return;
             
+            // Clear history when loading new data
+            historyStack = [];
+            UNDO_BUTTON.disabled = true;
+
             const docRef = doc(db, "activity_logs", dateId);
             currentLogUnsubscribe = onSnapshot(docRef, (docSnap) => {
-                clearForm(); // Clear the form before populating
+                clearForm();
                 if (docSnap.exists()) {
                     const data = docSnap.data();
                     const currentUser = USER_SELECT.value;
@@ -659,34 +900,7 @@
             };
 
             if (currentUser !== 'Elyas') {
-                dataToSave.rangoData = {
-                    metrics: {
-                        newLeads: NEW_LEADS_INPUT.value,
-                        estimatesGiven: ESTIMATES_GIVEN_INPUT.value,
-                    },
-                    socialMedia: {
-                        storyOne: document.getElementById('social_story_one').value,
-                        storyTwo: document.getElementById('social_story_two').value,
-                        storyThree: document.getElementById('social_story_three').value,
-                        storyFour: document.getElementById('social_story_four').value,
-                        reel1: document.getElementById('social_reel_1').value,
-                        saturdayStory: document.getElementById('social_saturday_story').value,
-                        sundayStory: document.getElementById('social_sunday_story').value,
-                    }
-                };
-                document.querySelectorAll('.entry-section').forEach(sectionEl => {
-                    const sectionName = sectionEl.dataset.section;
-                    dataToSave.rangoData[sectionName] = [];
-                    sectionEl.querySelectorAll('.entry-item').forEach(itemEl => {
-                        const desc = itemEl.querySelector('.desc').textContent;
-                        const valueEl = itemEl.querySelector('.value');
-                        const entry = { desc };
-                        if (valueEl) {
-                           entry.value = parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,""));
-                        }
-                        dataToSave.rangoData[sectionName].push(entry);
-                    });
-                });
+                dataToSave.rangoData = getCurrentRangoState(); // Use the state capture function
             }
 
             try {
@@ -765,8 +979,9 @@
         }
 
         async function handleLiveDieRepeat() {
+            pushStateToHistory(); // Save current state before overwriting
             const currentDateStr = LOG_DATE_INPUT.value;
-            const currentDate = new Date(currentDateStr + 'T12:00:00'); // Use noon to avoid timezone issues
+            const currentDate = new Date(currentDateStr + 'T12:00:00');
             currentDate.setDate(currentDate.getDate() - 1);
             const prevDateStr = currentDate.toISOString().slice(0, 10);
             
@@ -784,7 +999,7 @@
                     const userData = data[currentUser];
                     if (userData && userData.rangoData) {
                         populateRangoData(userData.rangoData);
-                        await saveData(); // Save the copied data to the current day
+                        await saveData();
                         updateStatus('Yesterday\'s data copied and saved!', false);
                     } else {
                         updateStatus(`No data found for ${currentUser} on ${prevDateStr}.`, false);
@@ -800,7 +1015,7 @@
 
         function handleCopySummary() {
             const userName = USER_SELECT.value;
-            const date = new Date(LOG_DATE_INPUT.value + 'T00:00:00').toLocaleDateString();
+            const date = new Date(LOG_DATE_INPUT.value + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'UTC' });
             let message = `*${userName.toUpperCase()} - DAILY REPORT for ${date}*\n\n`;
 
             if (userName !== 'Elyas') {
@@ -982,7 +1197,7 @@
                 date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
                 expires = "; expires=" + date.toUTCString();
             }
-            document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=None; Secure";
+            document.cookie = name + "=" + (value || "") + expires + "; path=/; SameSite=Lax";
         }
 
         function getCookie(name) {
@@ -1000,7 +1215,7 @@
         function updateStatus(message, isError, persistent = false) {
             clearTimeout(statusTimeout);
             STATUS_MESSAGE.textContent = message;
-            STATUS_MESSAGE.style.color = isError ? '#FF3B30' : '#34D399';
+            STATUS_MESSAGE.style.color = isError ? 'var(--color-danger)' : 'var(--color-success)';
             if (!persistent) {
                 statusTimeout = setTimeout(() => STATUS_MESSAGE.textContent = '', 3000);
             }
