@@ -129,6 +129,15 @@
             cursor: pointer;
             filter: brightness(0) saturate(100%) invert(31%) sepia(93%) saturate(3493%) hue-rotate(352deg) brightness(99%) contrast(106%);
         }
+        /* Hide arrows from number input */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
         .entry-item {
             display: flex;
             align-items: center;
@@ -233,136 +242,160 @@
         #liveDieRepeatButton:hover {
             box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.6), 0 0 25px 10px rgba(0, 0, 255, 0.4);
         }
+
+        #pinInput {
+            letter-spacing: 1.5rem;
+            text-align: center;
+            font-size: 2rem;
+            font-family: var(--font-heading);
+        }
     </style>
 </head>
 <body class="antialiased">
 
-    <div class="container mx-auto max-w-4xl p-4">
-        <div class="bg-surface border border-border rounded-2xl shadow-lg p-8">
-            <div class="text-center mb-8">
-                <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Daily Activity Logger</h1>
-                <p class="mt-2 text-sm" style="color: var(--color-text-muted);">Log your daily tasks and copy a formatted summary.</p>
-            </div>
-
-            <div class="space-y-6">
-                <!-- User and Date Selection -->
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <select id="userSelect" class="form-element w-full px-4 py-3">
-                        <option>rango</option>
-                        <option>Elyas</option>
-                    </select>
-                    <div class="flex gap-2">
-                        <input type="text" id="addNameInput" placeholder="Add New User" class="form-element w-full px-4 py-3">
-                        <button id="addNameButton" class="btn btn-secondary flex-shrink-0">Add</button>
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
-                    <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
-                </div>
-                
-                <!-- Rango-specific sections -->
-                <div id="rangoModeSections" class="space-y-6">
-                    <!-- Metrics Section -->
-                    <div id="metricsSection">
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                                <label for="newLeads" class="text-sm">New Leads Contacted</label>
-                                <div class="flex items-center border border-border rounded-lg">
-                                    <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
-                                    <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                    <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
-                                </div>
-                            </div>
-                            <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                                <label for="estimatesGiven" class="text-sm">Estimates Given</label>
-                                 <div class="flex items-center border border-border rounded-lg">
-                                    <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
-                                    <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                    <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Potential Clients -->
-                    <div class="entry-section" data-section="potentialClients">
-                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Potential Clients</label>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
-                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                            <button class="btn btn-secondary add-btn">+</button>
-                        </div>
-                        <div class="space-y-2 entry-list"></div>
-                    </div>
-                    <!-- Sold Cars -->
-                    <div class="entry-section" data-section="soldCars">
-                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Sold - Car Coming</label>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
-                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                            <button class="btn btn-secondary add-btn">+</button>
-                        </div>
-                        <div class="space-y-2 entry-list"></div>
-                    </div>
-                    <!-- Cars in Shop -->
-                    <div class="entry-section" data-section="carsInShop">
-                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Cars in Shop</label>
-                        <div class="flex gap-2 mb-2">
-                            <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
-                            <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                            <button class="btn btn-secondary add-btn">+</button>
-                        </div>
-                        <div class="space-y-2 entry-list"></div>
-                    </div>
-                    <!-- Social Media -->
-                    <div id="socialMediaSection">
-                        <div id="socialMediaToggle" class="flex items-center justify-between cursor-pointer">
-                            <div class="flex items-center">
-                                <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
-                                <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
-                            </div>
-                            <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
-                        </div>
-                        <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <input type="text" id="social_story_one" placeholder="Story One" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_story_two" placeholder="Story Two" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_story_three" placeholder="Story Three" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_story_four" placeholder="Story Four" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_reel_1" placeholder="Reel 1" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_saturday_story" placeholder="Saturday Story" class="form-element w-full px-4 py-3 data-field">
-                                <input type="text" id="social_sunday_story" placeholder="Sunday Story" class="form-element w-full px-4 py-3 data-field">
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Live Die Repeat Button -->
-                    <div>
-                        <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
-                    </div>
+    <div id="mainContent" class="hidden">
+        <div class="container mx-auto max-w-4xl p-4">
+            <div class="bg-surface border border-border rounded-2xl shadow-lg p-8">
+                <div class="text-center mb-8">
+                    <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Daily Activity Logger</h1>
+                    <p class="mt-2 text-sm" style="color: var(--color-text-muted);">Log your daily tasks and copy a formatted summary.</p>
                 </div>
 
-                <!-- Hourly activities section -->
-                <div>
-                    <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Hourly Activities</label>
+                <div class="space-y-6">
+                    <!-- User and Date Selection -->
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                        <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        <select id="userSelect" class="form-element w-full px-4 py-3">
+                            <option>rango</option>
+                            <option>Elyas</option>
+                        </select>
+                        <div class="flex gap-2">
+                            <input type="text" id="addNameInput" placeholder="Add New User" class="form-element w-full px-4 py-3">
+                            <button id="addNameButton" class="btn btn-secondary flex-shrink-0">Add</button>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
+                        <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
+                    </div>
+                    
+                    <!-- Rango-specific sections -->
+                    <div id="rangoModeSections" class="space-y-6">
+                        <!-- Metrics Section -->
+                        <div id="metricsSection">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                    <label for="newLeads" class="text-sm">New Leads Contacted</label>
+                                    <div class="flex items-center border border-border rounded-lg">
+                                        <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
+                                        <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                        <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                    <label for="estimatesGiven" class="text-sm">Estimates Given</label>
+                                     <div class="flex items-center border border-border rounded-lg">
+                                        <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
+                                        <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                        <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Potential Clients -->
+                        <div class="entry-section" data-section="potentialClients">
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Potential Clients</label>
+                            <div class="flex gap-2 mb-2">
+                                <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
+                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                <button class="btn btn-secondary add-btn">+</button>
+                            </div>
+                            <div class="space-y-2 entry-list"></div>
+                        </div>
+                        <!-- Sold Cars -->
+                        <div class="entry-section" data-section="soldCars">
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Sold - Car Coming</label>
+                            <div class="flex gap-2 mb-2">
+                                <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
+                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                <button class="btn btn-secondary add-btn">+</button>
+                            </div>
+                            <div class="space-y-2 entry-list"></div>
+                        </div>
+                        <!-- Cars in Shop -->
+                        <div class="entry-section" data-section="carsInShop">
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Cars in Shop</label>
+                            <div class="flex gap-2 mb-2">
+                                <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
+                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                <button class="btn btn-secondary add-btn">+</button>
+                            </div>
+                            <div class="space-y-2 entry-list"></div>
+                        </div>
+                        <!-- Social Media -->
+                        <div id="socialMediaSection">
+                            <div id="socialMediaToggle" class="flex items-center justify-between cursor-pointer">
+                                <div class="flex items-center">
+                                    <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
+                                    <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
+                                </div>
+                                <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
+                            </div>
+                            <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <input type="text" id="social_story_one" placeholder="Story One" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_story_two" placeholder="Story Two" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_story_three" placeholder="Story Three" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_story_four" placeholder="Story Four" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_reel_1" placeholder="Reel 1" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_saturday_story" placeholder="Saturday Story" class="form-element w-full px-4 py-3 data-field">
+                                    <input type="text" id="social_sunday_story" placeholder="Sunday Story" class="form-element w-full px-4 py-3 data-field">
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Live Die Repeat Button -->
+                        <div>
+                            <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
+                        </div>
+                    </div>
+
+                    <!-- Hourly activities section -->
+                    <div>
+                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Hourly Activities</label>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                        </div>
+                    </div>
+
+                    <div class="pt-4 flex gap-4">
+                         <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
+                         <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
                     </div>
                 </div>
 
-                <div class="pt-4 flex gap-4">
-                     <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
-                     <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
-                </div>
+                <div id="statusMessage" class="text-center text-sm mt-6 h-4"></div>
             </div>
+        </div>
+    </div>
 
-            <div id="statusMessage" class="text-center text-sm mt-6 h-4"></div>
+    <!-- Password Modal -->
+    <div id="pinModal" class="modal-overlay">
+        <div class="modal-content space-y-6">
+             <h2 class="text-2xl font-bold text-white text-center" style="font-family: var(--font-heading);">Enter 4-Digit PIN</h2>
+             <div>
+                <input type="number" id="pinInput" class="form-element w-full px-4 py-3" maxlength="4" oninput="this.value=this.value.slice(0,this.maxLength)">
+             </div>
+             <div class="flex items-center justify-center gap-2">
+                <input type="checkbox" id="rememberDevice" class="form-element" style="width: 1rem; height: 1rem;">
+                <label for="rememberDevice" class="text-sm" style="color: var(--color-text-muted);">Remember this device</label>
+             </div>
+             <p id="pinError" class="text-center h-4" style="color: var(--color-danger);"></p>
         </div>
     </div>
 
@@ -400,11 +433,16 @@
         const ESTIMATES_GIVEN_INPUT = document.getElementById('estimatesGiven');
         const LIVE_DIE_REPEAT_BUTTON = document.getElementById('liveDieRepeatButton');
         
-        // Export Modal Elements
+        // Modal Elements
         const EXPORT_MODAL = document.getElementById('exportModal');
         const SHOW_EXPORT_MODAL_BUTTON = document.getElementById('showExportModalButton');
         const CLOSE_EXPORT_MODAL_BUTTON = document.getElementById('closeExportModalButton');
         const EXPORT_CSV_BUTTON = document.getElementById('exportCsvButton');
+        const PIN_MODAL = document.getElementById('pinModal');
+        const PIN_INPUT = document.getElementById('pinInput');
+        const PIN_ERROR = document.getElementById('pinError');
+        const REMEMBER_DEVICE_CHECKBOX = document.getElementById('rememberDevice');
+        const MAIN_CONTENT = document.getElementById('mainContent');
 
         let db, auth;
         let currentLogUnsubscribe = null;
@@ -431,6 +469,14 @@
         }
 
         window.onload = () => {
+            if (getCookie('trusted_device') === 'true') {
+                unlockPage();
+            } else {
+                setupPinPrompt();
+            }
+        };
+        
+        function startApp() {
             initializeFirebase();
             const today = new Date();
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
@@ -442,7 +488,39 @@
             handleUserChange();
             setupEventListeners();
             loadDataForCurrentDate();
-        };
+        }
+
+        function setupPinPrompt() {
+            PIN_MODAL.classList.remove('hidden');
+            PIN_INPUT.focus();
+            PIN_INPUT.addEventListener('input', checkPin);
+        }
+
+        function checkPin() {
+            PIN_ERROR.textContent = '';
+            // The PIN is the numeric equivalent of "WIKD"
+            const correctPin = '9453'; 
+            
+            if (PIN_INPUT.value.length >= 4) {
+                if (PIN_INPUT.value === correctPin) {
+                    if (REMEMBER_DEVICE_CHECKBOX.checked) {
+                        setCookie('trusted_device', 'true', 30); // Cookie expires in 30 days
+                    }
+                    unlockPage();
+                } else {
+                    PIN_ERROR.textContent = 'Incorrect PIN';
+                    setTimeout(() => {
+                        PIN_INPUT.value = '';
+                    }, 500);
+                }
+            }
+        }
+        
+        function unlockPage() {
+            PIN_MODAL.classList.add('hidden');
+            MAIN_CONTENT.classList.remove('hidden');
+            startApp();
+        }
 
         function setupEventListeners() {
             COPY_SUMMARY_BUTTON.onclick = handleCopySummary;
@@ -894,6 +972,28 @@
                 console.error("Error exporting data: ", error);
                 updateStatus('Export failed.', true);
             }
+        }
+        
+        // Cookie helper functions
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        function getCookie(name) {
+            const nameEQ = name + "=";
+            const ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
         }
 
         let statusTimeout;
