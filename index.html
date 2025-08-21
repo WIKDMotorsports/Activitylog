@@ -3,16 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Activity Logger</title>
+    <title>Daily Activity Logger & Tools</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS library for XLSX export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
     <style>
         :root {
             --color-background: #0A0A0A;
             --color-text: #EAEAEA;
             --color-text-muted: #a1a1aa;
             --color-primary: #FF3B30;
+            --color-secondary: #3b82f6; /* Blue for AE tool buttons */
             --color-surface: #141414;
             --color-border: #2A2A2A;
             --color-danger: #ef4444;
@@ -37,15 +40,18 @@
         .max-w-4xl { max-width: 56rem; }
         .mx-auto { margin-left: auto; margin-right: auto; }
         .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
         .p-8 { padding: 2rem; }
         .pt-4 { padding-top: 1rem; }
         .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
         .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
         .bg-surface { background-color: var(--color-surface); }
         .border { border-width: 1px; }
         .border-border { border-color: var(--color-border); }
         .border-x { border-left-width: 1px; border-right-width: 1px; }
         .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
         .rounded-2xl { border-radius: 1rem; }
         .rounded-l-lg { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; }
         .rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
@@ -54,18 +60,26 @@
         .text-white { color: #fff; }
         .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
         .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
         .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
         .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
         .uppercase { text-transform: uppercase; }
         .mb-1 { margin-bottom: 0.25rem; }
         .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
         .mb-8 { margin-bottom: 2rem; }
         .mt-1 { margin-top: 0.25rem; }
         .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
         .mt-6 { margin-top: 1.5rem; }
         .h-4 { height: 1rem; }
         .w-full { width: 100%; }
         .w-16 { width: 4rem; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
         .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
         .grid { display: grid; }
         .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
@@ -77,7 +91,7 @@
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
         .flex-grow { flex-grow: 1; }
-        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sm\:flex-row { flex-direction: row; } }
         .form-element {
             background-color: var(--color-surface);
             border: 1px solid var(--color-border);
@@ -100,6 +114,7 @@
             padding: 12px 24px;
             transition: all 0.3s ease;
             cursor: pointer;
+            border: 1px solid transparent;
         }
         .btn:disabled {
             opacity: 0.5;
@@ -110,7 +125,7 @@
         .btn-primary {
             background-color: var(--color-primary);
             color: white;
-            border: 1px solid var(--color-primary);
+            border-color: var(--color-primary);
         }
         .btn-primary:hover:not(:disabled) {
             background-color: #E03024;
@@ -120,175 +135,237 @@
         .btn-secondary {
             background-color: var(--color-surface);
             color: var(--color-primary);
-            border: 1px solid var(--color-primary);
+            border-color: var(--color-primary);
         }
         .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
-        .btn-clear-section {
-            background: none;
-            border: none;
+        
+        /* Styles for AE Tool buttons */
+        .btn-ae-primary {
+            background-color: var(--color-secondary);
+            color: white;
+            border-color: var(--color-secondary);
+        }
+        .btn-ae-primary:hover:not(:disabled) {
+            background-color: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+        .btn-ae-secondary {
+            background-color: var(--color-surface);
             color: var(--color-text-muted);
-            cursor: pointer;
-            font-size: 0.75rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            padding: 0.25rem 0.5rem;
-            border-radius: 4px;
-            transition: all 0.2s ease;
+            border-color: var(--color-border);
         }
-        .btn-clear-section:hover {
-            color: var(--color-danger);
-            background-color: rgba(239, 68, 68, 0.1);
+        .btn-ae-secondary:hover:not(:disabled) { background-color: #2a2a2a; border-color: #4a4a4a; color: var(--color-text); }
+
+
+        .btn-clear-section {
+            background: none; border: none; color: var(--color-text-muted); cursor: pointer;
+            font-size: 0.75rem; font-weight: 500; text-transform: uppercase; padding: 0.25rem 0.5rem;
+            border-radius: 4px; transition: all 0.2s ease;
         }
+        .btn-clear-section:hover { color: var(--color-danger); background-color: rgba(239, 68, 68, 0.1); }
         select {
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            appearance: none;
+            -webkit-appearance: none; -moz-appearance: none; appearance: none;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%23a1a1aa' class='bi bi-chevron-down' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 1rem center;
-            background-size: 1em;
+            background-repeat: no-repeat; background-position: right 1rem center; background-size: 1em;
         }
         input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
             filter: brightness(0) saturate(100%) invert(31%) sepia(93%) saturate(3493%) hue-rotate(352deg) brightness(99%) contrast(106%);
         }
-        /* Hide arrows from number input */
-        input[type=number]::-webkit-inner-spin-button, 
-        input[type=number]::-webkit-outer-spin-button { 
-            -webkit-appearance: none; 
-            margin: 0; 
-        }
-        input[type=number] {
-            -moz-appearance: textfield;
-        }
+        input[type=number]::-webkit-inner-spin-button, input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+        input[type=number] { -moz-appearance: textfield; }
         .entry-item {
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            background-color: #0A0A0A;
-            padding: 0.5rem 0.75rem;
-            border-radius: 6px;
-            border: 1px solid var(--color-border);
+            display: flex; align-items: center; gap: 0.75rem; background-color: #0A0A0A;
+            padding: 0.5rem 0.75rem; border-radius: 6px; border: 1px solid var(--color-border);
         }
-        .entry-item .desc, .entry-item .value {
-            transition: all 0.2s ease;
-        }
+        .entry-item .desc, .entry-item .value { transition: all 0.2s ease; }
         .entry-item .desc { flex-grow: 1; }
         .entry-item .value { color: var(--color-text-muted); font-size: 0.875rem; }
         .entry-item-actions { display: flex; align-items: center; gap: 0.5rem; }
         .entry-item-btn {
             background: none; border: none; color: var(--color-text-muted); cursor: pointer;
-            padding: 0.25rem; line-height: 1;
-            transition: color 0.2s ease;
+            padding: 0.25rem; line-height: 1; transition: color 0.2s ease;
         }
         .entry-item-btn svg { width: 16px; height: 16px; }
         .entry-item-btn:hover { color: var(--color-primary); }
         .entry-item-btn.delete-btn:hover { color: var(--color-danger); }
         .entry-item-btn.save-btn:hover { color: var(--color-success); }
-        
-        .add-btn {
-            padding: 0.75rem;
-            font-size: 1.5rem;
-            line-height: 1;
-            font-family: var(--font-body);
-        }
-        .collapsible-content.collapsed {
-            display: none;
-        }
-        #socialMediaToggle.collapsed-state {
-            background-color: #0A0A0A;
-            padding: 0.75rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--color-border);
-            transition: all 0.2s ease-in-out;
-        }
-        #socialMediaToggle.collapsed-state:hover {
-            border-color: var(--color-primary);
-        }
+        .add-btn { padding: 0.75rem; font-size: 1.5rem; line-height: 1; font-family: var(--font-body); }
         .modal-overlay {
             position: fixed; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(0,0,0,0.7);
-            display: flex; align-items: center; justify-content: center;
+            background-color: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
             z-index: 100;
         }
         .modal-content {
-            background-color: var(--color-surface);
-            padding: 2rem;
-            border-radius: 1rem;
-            border: 1px solid var(--color-border);
-            width: 90%;
-            max-width: 500px;
+            background-color: var(--color-surface); padding: 2rem; border-radius: 1rem;
+            border: 1px solid var(--color-border); width: 90%; max-width: 500px;
         }
         .hidden { display: none; }
         .tally-btn {
-            font-family: var(--font-heading);
-            font-weight: 700;
-            font-size: 1.25rem;
-            line-height: 1;
-            color: var(--color-text-muted);
-            background-color: var(--color-surface);
-            padding: 0.5rem 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
-            border: none;
+            font-family: var(--font-heading); font-weight: 700; font-size: 1.25rem; line-height: 1;
+            color: var(--color-text-muted); background-color: var(--color-surface); padding: 0.5rem 0.75rem;
+            cursor: pointer; transition: all 0.2s ease-in-out; border: none;
         }
-        .tally-btn:hover {
-            color: var(--color-primary);
-            background-color: rgba(255, 59, 48, 0.1);
-        }
-        
+        .tally-btn:hover { color: var(--color-primary); background-color: rgba(255, 59, 48, 0.1); }
         .section-total {
-            margin-top: 0.75rem;
-            padding-top: 0.75rem;
-            border-top: 1px solid var(--color-border);
-            text-align: right;
-            font-weight: 600;
-            font-size: 1.125rem;
-            color: var(--color-text);
+            margin-top: 0.75rem; padding-top: 0.75rem; border-top: 1px solid var(--color-border);
+            text-align: right; font-weight: 600; font-size: 1.125rem; color: var(--color-text);
         }
-
-        @keyframes gradient-flow {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-
+        @keyframes gradient-flow { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
         #liveDieRepeatButton {
             background: linear-gradient(90deg, #00ffff, #0000ff, #00ffff);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-            border: none;
-            position: relative;
-            transition: box-shadow 0.3s ease-in-out;
-            background-size: 200% auto;
-            animation: gradient-flow 4s linear infinite;
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+            border: none; position: relative; transition: box-shadow 0.3s ease-in-out;
+            background-size: 200% auto; animation: gradient-flow 4s linear infinite;
         }
         #liveDieRepeatButton::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 8px;
-            padding: 2px; 
+            content: ''; position: absolute; inset: 0; border-radius: 8px; padding: 2px; 
             background: linear-gradient(90deg, #00ffff, #0000ff, #00ffff);
-            -webkit-mask:
-                linear-gradient(#fff 0 0) content-box,
-                linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            pointer-events: none;
-            background-size: 200% auto;
-            animation: gradient-flow 4s linear infinite;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+            background-size: 200% auto; animation: gradient-flow 4s linear infinite;
         }
-        #liveDieRepeatButton:hover:not(:disabled) {
-            box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.6), 0 0 25px 10px rgba(0, 0, 255, 0.4);
+        #liveDieRepeatButton:hover:not(:disabled) { box-shadow: 0 0 15px 3px rgba(0, 255, 255, 0.6), 0 0 25px 10px rgba(0, 0, 255, 0.4); }
+        #pinInput { letter-spacing: 1.5rem; text-align: center; font-size: 2rem; font-family: var(--font-heading); }
+        
+        /* --- New Tab and Tool Styles --- */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--color-border);
+            margin-bottom: 2rem;
+        }
+        .tab-button {
+            font-family: var(--font-heading);
+            font-size: 1.125rem;
+            font-weight: 600;
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: var(--color-text-muted);
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-button:hover {
+            color: var(--color-text);
+        }
+        .tab-button.active {
+            color: var(--color-primary);
+            border-bottom-color: var(--color-primary);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
 
-        #pinInput {
-            letter-spacing: 1.5rem;
-            text-align: center;
-            font-size: 2rem;
+        .tool-section {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 1rem;
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+        .tool-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            cursor: pointer;
+            background-color: rgba(255,255,255,0.02);
+        }
+        .tool-header h2 {
             font-family: var(--font-heading);
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--color-text);
+            line-height: 1.2;
+        }
+        .tool-header .toggle-icon {
+            transition: transform 0.3s ease;
+            font-size: 1.5rem;
+        }
+        .tool-header.open .toggle-icon {
+            transform: rotate(180deg);
+        }
+        .tool-content {
+            padding: 0 1.5rem;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, padding 0.5s ease-out;
+        }
+        .tool-header.open + .tool-content {
+            max-height: 2000px; /* Large enough for content */
+            padding: 1.5rem;
+            padding-top: 0;
+        }
+        #aeScriptOutput {
+            background-color: var(--color-background);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 1rem;
+            max-height: 24rem;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            color: #fef08a; /* yellow-200 */
+            font-family: monospace;
+            font-size: 0.875rem;
+        }
+        
+        /* Custom scrollbar for AE output */
+        #aeScriptOutput::-webkit-scrollbar { width: 8px; }
+        #aeScriptOutput::-webkit-scrollbar-track { background: #1a1a1a; }
+        #aeScriptOutput::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 4px; }
+        #aeScriptOutput::-webkit-scrollbar-thumb:hover { background: #6a6a6a; }
+
+        /* Iframe container for responsive embed */
+        .iframe-container {
+            position: relative;
+            width: 100%;
+            padding-top: 65%; /* Adjust this percentage for different aspect ratios */
+            overflow: hidden;
+            border-radius: 0.5rem;
+            border: 1px solid var(--color-border);
+        }
+        .iframe-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+        
+        /* Report styles */
+        #reportOutput {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+            padding-top: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .report-card {
+            background-color: #0A0A0A;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+        .report-card h3 {
+            margin-top: 0;
+            font-family: var(--font-heading);
+            color: var(--color-primary);
+        }
+        .report-card ul {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0 0 0;
+            list-style-type: disc;
+        }
+        .report-card li {
+            margin-bottom: 0.25rem;
         }
     </style>
 </head>
@@ -299,142 +376,290 @@
             <div class="bg-surface border border-border rounded-2xl shadow-lg p-8">
                 <div class="text-center mb-8">
                     <h1 class="text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Daily Activity Logger</h1>
-                    <p class="mt-2 text-sm" style="color: var(--color-text-muted);">Log your daily tasks and copy a formatted summary.</p>
+                    <p class="mt-2 text-sm" style="color: var(--color-text-muted);">Log your daily tasks and use helpful tools.</p>
                 </div>
 
-                <div class="space-y-6">
-                    <!-- User and Date Selection -->
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        <select id="userSelect" class="form-element w-full px-4 py-3">
-                            <option>rango</option>
-                            <option>Elyas</option>
-                        </select>
-                        <div class="flex gap-2">
-                            <input type="text" id="addNameInput" placeholder="Add New User" class="form-element w-full px-4 py-3">
-                            <button id="addNameButton" class="btn btn-secondary flex-shrink-0">Add</button>
+                <!-- Tabs Navigation -->
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="activityLogTab">Activity Log</button>
+                    <button class="tab-button" data-tab="toolsTab">Useful Tools</button>
+                </div>
+
+                <!-- Tab Content -->
+                <div id="activityLogTab" class="tab-content active">
+                    <div class="space-y-6">
+                        <!-- User and Date Selection -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <select id="userSelect" class="form-element w-full px-4 py-3">
+                                <option>rango</option>
+                                <option>Elyas</option>
+                            </select>
+                            <div class="flex gap-2">
+                                <input type="text" id="addNameInput" placeholder="Add New User" class="form-element w-full px-4 py-3">
+                                <button id="addNameButton" class="btn btn-secondary flex-shrink-0">Add</button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
+                            <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
+                        </div>
+                        
+                        <!-- Rango-specific sections -->
+                        <div id="rangoModeSections" class="space-y-6">
+                            <!-- Metrics Section -->
+                            <div id="metricsSection">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                        <label for="newLeads" class="text-sm">New Leads Contacted</label>
+                                        <div class="flex items-center border border-border rounded-lg">
+                                            <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
+                                            <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                            <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
+                                        <label for="estimatesGiven" class="text-sm">Estimates Given</label>
+                                        <div class="flex items-center border border-border rounded-lg">
+                                            <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
+                                            <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
+                                            <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Potential Clients -->
+                            <div class="entry-section" data-section="potentialClients">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Potential Clients</label>
+                                    <button type="button" class="btn-clear-section">Clear All</button>
+                                </div>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
+                                    <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                    <button class="btn btn-secondary add-btn">+</button>
+                                </div>
+                                <div class="space-y-2 entry-list"></div>
+                                <div class="section-total"></div>
+                            </div>
+                            <!-- Sold Cars -->
+                            <div class="entry-section" data-section="soldCars">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Sold - Car Coming</label>
+                                    <button type="button" class="btn-clear-section">Clear All</button>
+                                </div>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
+                                    <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                    <button class="btn btn-secondary add-btn">+</button>
+                                </div>
+                                <div class="space-y-2 entry-list"></div>
+                                <div class="section-total"></div>
+                            </div>
+                            <!-- Cars in Shop -->
+                            <div class="entry-section" data-section="carsInShop">
+                                <div class="flex justify-between items-center mb-1">
+                                    <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Cars in Shop</label>
+                                    <button type="button" class="btn-clear-section">Clear All</button>
+                                </div>
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
+                                    <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
+                                    <button class="btn btn-secondary add-btn">+</button>
+                                </div>
+                                <div class="space-y-2 entry-list"></div>
+                                <div class="section-total"></div>
+                            </div>
+                            <!-- Social Media -->
+                            <div id="socialMediaSection">
+                                <div id="socialMediaToggle" class="flex items-center justify-between cursor-pointer">
+                                    <div class="flex items-center">
+                                        <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
+                                        <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
+                                    </div>
+                                    <div class="flex items-center gap-4">
+                                        <button type="button" class="btn-clear-section hidden">Clear All</button>
+                                        <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
+                                    </div>
+                                </div>
+                                <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <input type="text" id="social_story_one" placeholder="Story One" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_story_two" placeholder="Story Two" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_story_three" placeholder="Story Three" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_story_four" placeholder="Story Four" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_reel_1" placeholder="Reel 1" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_saturday_story" placeholder="Saturday Story" class="form-element w-full px-4 py-3 data-field">
+                                        <input type="text" id="social_sunday_story" placeholder="Sunday Story" class="form-element w-full px-4 py-3 data-field">
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Action Buttons -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <button id="undoButton" class="btn btn-secondary w-full justify-center" disabled>Undo Last Edit</button>
+                                <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
+                            </div>
+                        </div>
+
+                        <!-- Hourly activities section -->
+                        <div>
+                            <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Hourly Activities</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 flex gap-4">
+                             <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
+                             <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
                         </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
-                        <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
+                </div>
+
+                <div id="toolsTab" class="tab-content">
+                    <!-- AE Script Generator Tool -->
+                    <div class="tool-section">
+                        <div class="tool-header">
+                            <div>
+                                <h2>AE Batch Replace Script Generator</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Specifically for the Performance Packages Meta Ads.</p>
+                            </div>
+                            <span class="toggle-icon">&#9660;</span> <!-- Down arrow -->
+                        </div>
+                        <div class="tool-content">
+                            <div class="space-y-6">
+                                <!-- Step 1: Choose Footage Pack -->
+                                <div class="space-y-2">
+                                    <label for="footagePack" class="block font-semibold text-sm" style="color: var(--color-text-muted);">1. Choose Footage Source</label>
+                                    <select id="footagePack" class="form-element w-full px-4 py-3">
+                                        <option value="custom">Custom List</option>
+                                        <option value="blackwing">Blackwing Footage Pack</option>
+                                    </select>
+                                </div>
+
+                                <!-- Step 2: Paste File Paths -->
+                                <div class="space-y-2">
+                                    <label for="filePaths" class="block font-semibold text-sm" style="color: var(--color-text-muted);">2. Paste File Paths (one per line)</label>
+                                    <textarea id="filePaths" rows="8" class="form-element w-full px-4 py-3" placeholder="\\server\share\file1.mov&#10;\\server\share\file2.mp4&#10;C:\Users\YourName\Videos\clip3.mkv"></textarea>
+                                </div>
+
+                                <!-- Step 3: Choose Script Type -->
+                                <div class="space-y-2">
+                                    <label class="block font-semibold text-sm" style="color: var(--color-text-muted);">3. Choose Script Type</label>
+                                    <div class="flex flex-col sm:flex-row gap-4">
+                                        <label class="flex-grow p-4 rounded-lg border has-[:checked]:border-secondary has-[:checked]:bg-gray-900 transition cursor-pointer" style="background-color: #0A0A0A; border-color: var(--color-border);">
+                                            <input type="radio" name="scriptType" value="project" class="hidden" checked>
+                                            <div class="flex flex-col">
+                                                <span class="font-bold text-white">Replace in Project Panel</span>
+                                                <span class="text-sm" style="color: var(--color-text-muted);">Replaces selected footage items in the project browser.</span>
+                                            </div>
+                                        </label>
+                                        <label class="flex-grow p-4 rounded-lg border has-[:checked]:border-secondary has-[:checked]:bg-gray-900 transition cursor-pointer" style="background-color: #0A0A0A; border-color: var(--color-border);">
+                                            <input type="radio" name="scriptType" value="layers" class="hidden">
+                                             <div class="flex flex-col">
+                                                <span class="font-bold text-white">Replace Selected Layers</span>
+                                                <span class="text-sm" style="color: var(--color-text-muted);">Replaces selected layers in the active composition.</span>
+                                            </div>
+                                        </label>
+                                    </div>
+                                </div>
+
+                                <!-- Generate Button -->
+                                <button id="generateBtn" class="btn btn-ae-primary w-full text-lg">
+                                    Generate Script
+                                </button>
+
+                                <!-- Output Section -->
+                                <div id="outputContainer" class="hidden mt-6 space-y-4">
+                                    <div class="flex flex-wrap justify-between items-center gap-4">
+                                        <h3 class="text-xl font-semibold text-white">Generated Script</h3>
+                                        <div class="flex gap-2">
+                                             <button id="copyBtn" class="btn btn-ae-secondary py-2 px-4 text-sm uppercase">
+                                                Copy
+                                            </button>
+                                            <button id="downloadBtn" class="btn py-2 px-4 text-sm uppercase" style="background-color: #166534; color: white; border-color: #166534;">
+                                                Download .jsx
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <pre id="aeScriptOutput"><code></code></pre>
+                                    <div id="copy-success" class="text-center font-medium hidden" style="color: var(--color-success);">Copied to clipboard!</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Background Removal Tool -->
+                    <div class="tool-section">
+                        <div class="tool-header">
+                            <div>
+                                <h2>Background Removal Tool</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Quickly remove the background from your images.</p>
+                            </div>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="tool-content">
+                            <div class="iframe-container">
+                                <iframe src="https://not-lain-background-removal.hf.space"></iframe>
+                            </div>
+                        </div>
                     </div>
                     
-                    <!-- Rango-specific sections -->
-                    <div id="rangoModeSections" class="space-y-6">
-                        <!-- Metrics Section -->
-                        <div id="metricsSection">
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                                    <label for="newLeads" class="text-sm">New Leads Contacted</label>
-                                    <div class="flex items-center border border-border rounded-lg">
-                                        <button type="button" id="leadsDecrement" class="tally-btn rounded-l-lg">-</button>
-                                        <input type="number" id="newLeads" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                        <button type="button" id="leadsIncrement" class="tally-btn rounded-r-lg">+</button>
-                                    </div>
-                                </div>
-                                <div class="flex items-center justify-between p-3 rounded-lg" style="background-color: #0A0A0A;">
-                                    <label for="estimatesGiven" class="text-sm">Estimates Given</label>
-                                    <div class="flex items-center border border-border rounded-lg">
-                                        <button type="button" id="estimatesDecrement" class="tally-btn rounded-l-lg">-</button>
-                                        <input type="number" id="estimatesGiven" value="0" class="form-element w-16 text-center bg-transparent border-x border-border" style="border-radius: 0;">
-                                        <button type="button" id="estimatesIncrement" class="tally-btn rounded-r-lg">+</button>
-                                    </div>
-                                </div>
+                    <!-- Text to Speech Tool -->
+                    <div class="tool-section">
+                        <div class="tool-header">
+                            <div>
+                                <h2>Text to Speech Tool</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Convert text into spoken audio.</p>
                             </div>
+                            <span class="toggle-icon">&#9660;</span>
                         </div>
-                        <!-- Potential Clients -->
-                        <div class="entry-section" data-section="potentialClients">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Potential Clients</label>
-                                <button type="button" class="btn-clear-section">Clear All</button>
+                        <div class="tool-content">
+                            <div class="iframe-container">
+                                <iframe src="https://nihalgazi-text-to-speech-unlimited.hf.space"></iframe>
                             </div>
-                            <div class="flex gap-2 mb-2">
-                                <input type="text" placeholder="Description (e.g., 2022 C7Z Package)" class="form-element w-full px-4 py-3 entry-desc">
-                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                                <button class="btn btn-secondary add-btn">+</button>
-                            </div>
-                            <div class="space-y-2 entry-list"></div>
-                            <div class="section-total"></div>
-                        </div>
-                        <!-- Sold Cars -->
-                        <div class="entry-section" data-section="soldCars">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Sold - Car Coming</label>
-                                <button type="button" class="btn-clear-section">Clear All</button>
-                            </div>
-                            <div class="flex gap-2 mb-2">
-                                <input type="text" placeholder="Description (e.g., 2024 Blackwing Package)" class="form-element w-full px-4 py-3 entry-desc">
-                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                                <button class="btn btn-secondary add-btn">+</button>
-                            </div>
-                            <div class="space-y-2 entry-list"></div>
-                            <div class="section-total"></div>
-                        </div>
-                        <!-- Cars in Shop -->
-                        <div class="entry-section" data-section="carsInShop">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-sm font-medium" style="color: var(--color-text-muted);">Cars in Shop</label>
-                                <button type="button" class="btn-clear-section">Clear All</button>
-                            </div>
-                            <div class="flex gap-2 mb-2">
-                                <input type="text" placeholder="Description (e.g., MacGruber)" class="form-element w-full px-4 py-3 entry-desc">
-                                <input type="number" placeholder="Value" class="form-element w-1/3 px-4 py-3 entry-value">
-                                <button class="btn btn-secondary add-btn">+</button>
-                            </div>
-                            <div class="space-y-2 entry-list"></div>
-                            <div class="section-total"></div>
-                        </div>
-                        <!-- Social Media -->
-                        <div id="socialMediaSection">
-                            <div id="socialMediaToggle" class="flex items-center justify-between cursor-pointer">
-                                <div class="flex items-center">
-                                    <label class="block text-sm font-medium" style="color: var(--color-text-muted); pointer-events: none;">Social Media</label>
-                                    <span id="expandCue" class="text-xs" style="color: var(--color-text-muted); margin-left: 8px;">(Click to expand)</span>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <button type="button" class="btn-clear-section hidden">Clear All</button>
-                                    <span id="socialMediaIcon" class="text-lg">&#9654;</span> <!-- Right arrow -->
-                                </div>
-                            </div>
-                            <div id="socialMediaContent" class="collapsible-content collapsed mt-2 p-4 rounded-lg" style="background-color: #0A0A0A; border: 1px solid var(--color-border);">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                                    <input type="text" id="social_story_one" placeholder="Story One" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_story_two" placeholder="Story Two" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_story_three" placeholder="Story Three" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_story_four" placeholder="Story Four" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_reel_1" placeholder="Reel 1" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_saturday_story" placeholder="Saturday Story" class="form-element w-full px-4 py-3 data-field">
-                                    <input type="text" id="social_sunday_story" placeholder="Sunday Story" class="form-element w-full px-4 py-3 data-field">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Action Buttons -->
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <button id="undoButton" class="btn btn-secondary w-full justify-center" disabled>Undo Last Edit</button>
-                            <button id="liveDieRepeatButton" class="btn w-full justify-center">Live, Die, Repeat</button>
                         </div>
                     </div>
 
-                    <!-- Hourly activities section -->
-                    <div>
-                        <label class="block text-sm font-medium mb-2" style="color: var(--color-text-muted);">Hourly Activities</label>
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
-                            <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                    <!-- Object Clear Tool -->
+                    <div class="tool-section">
+                        <div class="tool-header">
+                            <div>
+                                <h2>Object Clear Tool</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Remove unwanted objects from your images.</p>
+                            </div>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="tool-content">
+                            <div class="iframe-container">
+                                <iframe src="https://jixin0101-objectclear.hf.space"></iframe>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="pt-4 flex gap-4">
-                         <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
-                         <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
+                    <!-- AI Image Editing Tool -->
+                    <div class="tool-section">
+                        <div class="tool-header">
+                            <div>
+                                <h2>AI Image Editing Tool</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Edit your images using text prompts.</p>
+                            </div>
+                            <span class="toggle-icon">&#9660;</span>
+                        </div>
+                        <div class="tool-content">
+                            <div class="iframe-container">
+                                <iframe src="https://qwen-qwen-image-edit.hf.space"></iframe>
+                            </div>
+                        </div>
                     </div>
                 </div>
+
 
                 <div id="statusMessage" class="text-center text-sm mt-6 h-4"></div>
             </div>
@@ -471,7 +696,15 @@
                 <label for="endDate" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">End Date</label>
                 <input type="date" id="endDate" class="mt-1 block w-full px-4 py-3 form-element">
             </div>
-            <button id="exportCsvButton" class="btn btn-primary w-full justify-center">Download CSV</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button id="generateReportButton" class="btn btn-primary w-full justify-center">Generate Report</button>
+                <button id="exportXlsxButton" class="btn btn-secondary w-full justify-center">Download XLSX</button>
+            </div>
+            <div id="reportHeader" class="hidden justify-between items-center mt-4">
+                 <h3 class="text-xl font-semibold text-white">Generated Report</h3>
+                 <button id="copyReportButton" class="btn btn-secondary py-2 px-4 text-sm uppercase">Copy Report</button>
+            </div>
+            <div id="reportOutput"></div>
         </div>
     </div>
 
@@ -479,7 +712,9 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1";
 
+        // --- GLOBAL DOM ELEMENTS ---
         const USER_SELECT = document.getElementById('userSelect');
         const ADD_NAME_BUTTON = document.getElementById('addNameButton');
         const COPY_SUMMARY_BUTTON = document.getElementById('copySummaryButton');
@@ -490,12 +725,14 @@
         const ESTIMATES_GIVEN_INPUT = document.getElementById('estimatesGiven');
         const LIVE_DIE_REPEAT_BUTTON = document.getElementById('liveDieRepeatButton');
         const UNDO_BUTTON = document.getElementById('undoButton');
-        
-        // Modal Elements
         const EXPORT_MODAL = document.getElementById('exportModal');
         const SHOW_EXPORT_MODAL_BUTTON = document.getElementById('showExportModalButton');
         const CLOSE_EXPORT_MODAL_BUTTON = document.getElementById('closeExportModalButton');
-        const EXPORT_CSV_BUTTON = document.getElementById('exportCsvButton');
+        const EXPORT_XLSX_BUTTON = document.getElementById('exportXlsxButton');
+        const GENERATE_REPORT_BUTTON = document.getElementById('generateReportButton');
+        const REPORT_HEADER = document.getElementById('reportHeader');
+        const COPY_REPORT_BUTTON = document.getElementById('copyReportButton');
+        const REPORT_OUTPUT = document.getElementById('reportOutput');
         const PIN_MODAL = document.getElementById('pinModal');
         const PIN_INPUT = document.getElementById('pinInput');
         const PIN_ERROR = document.getElementById('pinError');
@@ -505,11 +742,22 @@
         let db, auth;
         let currentLogUnsubscribe = null;
         let saveTimeout = null;
-        
-        // Undo functionality state
         let historyStack = [];
         const MAX_HISTORY_SIZE = 20;
-        
+
+        // --- AI MODEL INITIALIZATION ---
+        let summarizerPromise = (async () => {
+            try {
+                // Use the imported pipeline function directly
+                return await pipeline('summarization', 'Xenova/distilbart-cnn-12-6');
+            } catch(e) {
+                console.error("Failed to load summarization model", e);
+                return null;
+            }
+        })();
+
+
+        // --- INITIALIZATION ---
         function initializeFirebase() {
             const firebaseConfig = {
                 apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
@@ -525,8 +773,8 @@
                 db = getFirestore(app);
                 auth = getAuth(app);
             } catch (error) {
-                 console.error("Firebase initialization failed:", error);
-                 updateStatus('Could not connect to the database.', true);
+                console.error("Firebase initialization failed:", error);
+                updateStatus('Could not connect to the database.', true);
             }
         }
 
@@ -537,21 +785,23 @@
                 setupPinPrompt();
             }
         };
-        
+
         function startApp() {
             initializeFirebase();
             const today = new Date();
             today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
             const todayStr = today.toISOString().slice(0,10);
             LOG_DATE_INPUT.value = todayStr;
-            document.getElementById('endDate').value = todayStr; // Default end date for export
+            document.getElementById('endDate').value = todayStr;
             
             USER_SELECT.value = 'rango';
             handleUserChange();
             setupEventListeners();
+            setupAETool(); // Initialize the new tool
             loadDataForCurrentDate();
         }
 
+        // --- AUTH & UNLOCK ---
         function setupPinPrompt() {
             PIN_MODAL.classList.remove('hidden');
             PIN_INPUT.focus();
@@ -560,20 +810,17 @@
 
         function checkPin() {
             PIN_ERROR.textContent = '';
-            // The PIN is the numeric equivalent of "WIKD"
             const correctPin = '9453'; 
             
             if (PIN_INPUT.value.length >= 4) {
                 if (PIN_INPUT.value === correctPin) {
                     if (REMEMBER_DEVICE_CHECKBOX.checked) {
-                        setCookie('trusted_device', 'true', 30); // Cookie expires in 30 days
+                        setCookie('trusted_device', 'true', 30);
                     }
                     unlockPage();
                 } else {
                     PIN_ERROR.textContent = 'Incorrect PIN';
-                    setTimeout(() => {
-                        PIN_INPUT.value = '';
-                    }, 500);
+                    setTimeout(() => { PIN_INPUT.value = ''; }, 500);
                 }
             }
         }
@@ -583,20 +830,20 @@
             MAIN_CONTENT.classList.remove('hidden');
             startApp();
         }
-
+        
+        // --- EVENT LISTENERS SETUP ---
         function setupEventListeners() {
+            // Logger Listeners
             COPY_SUMMARY_BUTTON.onclick = handleCopySummary;
             ADD_NAME_BUTTON.onclick = handleAddName;
             LIVE_DIE_REPEAT_BUTTON.onclick = handleLiveDieRepeat;
             UNDO_BUTTON.onclick = handleUndo;
-
             USER_SELECT.addEventListener('change', () => {
                 handleUserChange();
                 loadDataForCurrentDate();
             });
             LOG_DATE_INPUT.addEventListener('change', loadDataForCurrentDate);
 
-            // Debounced save for text fields
             document.querySelectorAll('.data-field, #newLeads, #estimatesGiven').forEach(field => {
                 field.addEventListener('focus', pushStateToHistory);
                 field.addEventListener('input', () => {
@@ -605,15 +852,9 @@
                 });
             });
 
-            document.querySelectorAll('.entry-section .add-btn').forEach(button => {
-                button.addEventListener('click', handleAddEntry);
-            });
-
-            document.querySelectorAll('.btn-clear-section').forEach(button => {
-                button.addEventListener('click', handleClearSection);
-            });
-
-            // Tally buttons
+            document.querySelectorAll('.entry-section .add-btn').forEach(button => button.addEventListener('click', handleAddEntry));
+            document.querySelectorAll('.btn-clear-section').forEach(button => button.addEventListener('click', handleClearSection));
+            
             const setupTallyButton = (id, inputEl, change) => {
                 document.getElementById(id).onclick = () => {
                     pushStateToHistory();
@@ -626,7 +867,7 @@
             setupTallyButton('estimatesDecrement', ESTIMATES_GIVEN_INPUT, -1);
             setupTallyButton('estimatesIncrement', ESTIMATES_GIVEN_INPUT, 1);
 
-            // Social Media Collapse Toggle
+            // Social Media Collapse
             const socialMediaToggle = document.getElementById('socialMediaToggle');
             const socialMediaContent = document.getElementById('socialMediaContent');
             const socialMediaIcon = document.getElementById('socialMediaIcon');
@@ -638,20 +879,281 @@
                 socialMediaIcon.innerHTML = isNowCollapsed ? '&#9654;' : '&#9660;';
                 socialMediaToggle.classList.toggle('collapsed-state', isNowCollapsed);
                 expandCue.style.display = isNowCollapsed ? 'inline' : 'none';
-                
                 const clearBtn = document.querySelector('#socialMediaSection .btn-clear-section');
-                if (clearBtn) {
-                    clearBtn.classList.toggle('hidden', isNowCollapsed);
-                }
+                if (clearBtn) clearBtn.classList.toggle('hidden', isNowCollapsed);
             });
             
-            // Export Modal Listeners
-            SHOW_EXPORT_MODAL_BUTTON.onclick = () => EXPORT_MODAL.classList.remove('hidden');
+            // Export Modal
+            SHOW_EXPORT_MODAL_BUTTON.onclick = () => {
+                REPORT_OUTPUT.innerHTML = ''; // Clear previous reports
+                REPORT_HEADER.classList.add('hidden');
+                EXPORT_MODAL.classList.remove('hidden');
+            };
             CLOSE_EXPORT_MODAL_BUTTON.onclick = () => EXPORT_MODAL.classList.add('hidden');
-            EXPORT_CSV_BUTTON.onclick = handleExport;
+            EXPORT_XLSX_BUTTON.onclick = handleExport;
+            GENERATE_REPORT_BUTTON.onclick = handleGenerateReport;
+            COPY_REPORT_BUTTON.onclick = handleCopyReport;
+
+
+            // Tab functionality
+            document.querySelectorAll('.tab-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+                    button.classList.add('active');
+                    document.getElementById(button.dataset.tab).classList.add('active');
+                });
+            });
+
+            // Tool collapsible sections
+            document.querySelectorAll('.tool-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    header.classList.toggle('open');
+                });
+            });
         }
-        
-        // --- TOTALS CALCULATION ---
+
+        // --- AE SCRIPT GENERATOR LOGIC ---
+        function setupAETool() {
+            const blackwingFootagePack = [
+                "\\\\192.168.1.207\\DaleG\\2025\\1-7\\blackwing v idle.mp4",
+                "\\\\192.168.1.207\\DaleG\\2025\\1-6\\blackwing idle 3.mp4",
+                "\\\\192.168.1.207\\DaleG\\2025\\1-6\\blackwing idle 2.mp4",
+                "\\\\192.168.1.207\\DaleG\\2025\\1-3\\blackwing idle.mp4",
+                "\\\\192.168.1.207\\ChaseFarrow\\Reels For Tommy\\Blackwing Dyno Pull 1.mp4",
+                "\\\\192.168.1.207\\ChaseFarrow\\Videos\\1.) Magnificent Obsession\\Events\\We Built the Worlds Fastest Stick Shift Blackwing!.mkv",
+                "\\\\192.168.1.207\\ChaseFarrow\\Videos\\1.) Magnificent Obsession\\Cars\\CT5-V\\Blackwing Tail Focus Fix_prob4.mp4",
+                "\\\\192.168.1.207\\AidanOwnby\\Desktop\\Downloads\\Giving the CT5-V Blackwing some quick upgrades + Exhaust sound.mp4",
+                "\\\\192.168.1.207\\ChaseFarrow\\General Footage\\Events\\Blackwing Track Day\\Drone\\AI HFR\\Blackwing TMP_1_apo8.mp4",
+                "\\\\192.168.1.207\\ChaseFarrow\\Cars\\WIKD\\WIKD Blackwing\\HFR\\Blackwing Rear Brake (HFR).mp4",
+                "\\\\192.168.1.207\\AidanOwnby\\Backups\\XD9 Pro Backup\\youtube shorts vertical\\blackwing vs ws6\\IMG_6609.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Backups\\XD9 Pro Backup\\youtube shorts vertical\\blackwing vs ws6\\IMG_6605.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Backups\\XD9 Pro Backup\\youtube shorts vertical\\blackwing vs ws6\\IMG_6607.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1697.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1698.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1654.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1655.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1658.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1659.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1660.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1662.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1663.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1664.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1665.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1666.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1667.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1669.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1673.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1676.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1677.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1678.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1679.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1681.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1683.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1684.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1686.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1687.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1688.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1690.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1692.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1693.mov",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1694.MOV",
+                "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1696.MOV"
+            ];
+
+            const footagePackSelect = document.getElementById('footagePack');
+            const filePathsTextarea = document.getElementById('filePaths');
+            const generateBtn = document.getElementById('generateBtn');
+            const outputContainer = document.getElementById('outputContainer');
+            const scriptOutput = document.getElementById('aeScriptOutput').querySelector('code');
+            const copyBtn = document.getElementById('copyBtn');
+            const downloadBtn = document.getElementById('downloadBtn');
+            const copySuccessMessage = document.getElementById('copy-success');
+
+            footagePackSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'blackwing') {
+                    filePathsTextarea.value = blackwingFootagePack.join('\n');
+                } else {
+                    filePathsTextarea.value = '';
+                }
+            });
+
+            generateBtn.addEventListener('click', () => {
+                const paths = filePathsTextarea.value.split('\n')
+                    .map(p => p.trim().replace(/['"]+/g, ''))
+                    .filter(p => p.length > 0);
+
+                if (paths.length === 0) {
+                    // Replace alert with a more modern notification if desired
+                    alert('Please provide at least one file path.');
+                    return;
+                }
+
+                const scriptType = document.querySelector('input[name="scriptType"]:checked').value;
+                const generatedScript = scriptType === 'project' 
+                    ? generateProjectReplaceScript(paths) 
+                    : generateLayerReplaceScript(paths);
+
+                scriptOutput.textContent = generatedScript;
+                outputContainer.classList.remove('hidden');
+                copySuccessMessage.classList.add('hidden');
+                copyBtn.textContent = 'Copy';
+            });
+            
+            copyBtn.addEventListener('click', () => {
+                const textToCopy = scriptOutput.textContent;
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = textToCopy;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                
+                try {
+                    document.execCommand('copy');
+                    copyBtn.textContent = 'Copied!';
+                    copySuccessMessage.classList.remove('hidden');
+                } catch (err) {
+                    console.error('Failed to copy text: ', err);
+                    copyBtn.textContent = 'Copy Failed';
+                }
+                
+                document.body.removeChild(tempTextArea);
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                const scriptContent = scriptOutput.textContent;
+                if (!scriptContent) {
+                    alert('Please generate a script first.');
+                    return;
+                }
+                const blob = new Blob([scriptContent], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'ae_batch_replace.jsx';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+
+            function formatPathsForScript(paths) {
+                return paths.map(p => `"${p.replace(/\\/g, '\\\\')}"`).join(',\n        ');
+            }
+
+            function generateProjectReplaceScript(paths) {
+                const formattedPaths = formatPathsForScript(paths);
+                return `// After Effects Script: Replace Footage in Project Panel
+// How to use:
+// 1. Save this file with a .jsx extension.
+// 2. In After Effects, select the footage items in the Project Panel in the order you want them replaced.
+// 3. Go to File > Scripts > Run Script File... and select this .jsx file.
+
+(function replaceProjectFootage() {
+    var newFilePaths = [
+        ${formattedPaths}
+    ];
+
+    app.beginUndoGroup("Batch Replace Project Footage");
+
+    try {
+        var selectedItems = app.project.selection;
+        var footageItems = [];
+
+        for (var i = 0; i < selectedItems.length; i++) {
+            if (selectedItems[i] instanceof FootageItem) {
+                footageItems.push(selectedItems[i]);
+            }
+        }
+
+        if (footageItems.length === 0) {
+            alert("Please select one or more footage items in the Project panel.");
+            return;
+        }
+
+        if (newFilePaths.length !== footageItems.length) {
+            alert("Error: The number of file paths (" + newFilePaths.length + ") does not match the number of selected footage items (" + footageItems.length + ").");
+            return;
+        }
+
+        for (var j = 0; j < footageItems.length; j++) {
+            var currentItem = footageItems[j];
+            var newFile = new File(newFilePaths[j]);
+
+            if (newFile.exists) {
+                currentItem.replace(newFile);
+            } else {
+                alert("Skipping: File not found at path:\\n" + newFilePaths[j]);
+            }
+        }
+        alert("Replacement complete! " + footageItems.length + " footage items have been updated.");
+
+    } catch (e) {
+        alert("An error occurred: " + e.toString());
+    } finally {
+        app.endUndoGroup();
+    }
+})();`;
+            }
+            
+            function generateLayerReplaceScript(paths) {
+                const formattedPaths = formatPathsForScript(paths);
+                return `// After Effects Script: Replace Selected Layers in Composition
+// How to use:
+// 1. Save this file with a .jsx extension.
+// 2. In After Effects, open your composition and select the layers in the timeline in the order you want them replaced.
+// 3. Go to File > Scripts > Run Script File... and select this .jsx file.
+
+(function replaceLayerFootage() {
+    var newFilePaths = [
+        ${formattedPaths}
+    ];
+
+    app.beginUndoGroup("Batch Replace Layer Sources");
+
+    try {
+        var comp = app.project.activeItem;
+        if (!(comp instanceof CompItem)) {
+            alert("Please select a composition first.");
+            return;
+        }
+
+        var selectedLayers = comp.selectedLayers;
+        if (selectedLayers.length === 0) {
+            alert("Please select the layers you want to replace in the timeline.");
+            return;
+        }
+
+        if (newFilePaths.length !== selectedLayers.length) {
+            alert("Error: The number of file paths (" + newFilePaths.length + ") does not match the number of selected layers (" + selectedLayers.length + ").");
+            return;
+        }
+
+        for (var i = 0; i < selectedLayers.length; i++) {
+            var layer = selectedLayers[i];
+            var newFile = new File(newFilePaths[i]);
+
+            if (!newFile.exists) {
+                alert("Skipping: File not found at path:\\n" + newFilePaths[i]);
+                continue;
+            }
+
+            var importOptions = new ImportOptions(newFile);
+            var newFootageItem = app.project.importFile(importOptions);
+            layer.replaceSource(newFootageItem, true);
+        }
+        alert("Replacement complete! " + selectedLayers.length + " layers have been updated.");
+
+    } catch (e) {
+        alert("An error occurred: " + e.toString());
+    } finally {
+        app.endUndoGroup();
+    }
+})();`;
+            }
+        }
+
+        // --- LOGGER CORE LOGIC (Data, UI, etc.) ---
         function updateSectionTotal(sectionEl) {
             if (!sectionEl) return;
             const totalEl = sectionEl.querySelector('.section-total');
@@ -662,28 +1164,21 @@
             items.forEach(item => {
                 const valueEl = item.querySelector('.value');
                 if (valueEl) {
-                    // Check if we are in edit mode for this item
                     if (item.classList.contains('is-editing')) {
                         const valueInput = valueEl.querySelector('input');
-                        if (valueInput) {
-                            total += parseFloat(valueInput.value) || 0;
-                        }
+                        if (valueInput) total += parseFloat(valueInput.value) || 0;
                     } else {
                         total += parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g, "")) || 0;
                     }
                 }
             });
-
             totalEl.textContent = `Total: ${total.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}`;
         }
 
         function updateAllTotals() {
-            document.querySelectorAll('.entry-section[data-section]').forEach(sectionEl => {
-                updateSectionTotal(sectionEl);
-            });
+            document.querySelectorAll('.entry-section[data-section]').forEach(sectionEl => updateSectionTotal(sectionEl));
         }
 
-        // --- UNDO FUNCTIONALITY ---
         function getCurrentRangoState() {
             const state = {
                 metrics: {
@@ -717,13 +1212,10 @@
         }
 
         function pushStateToHistory() {
-            if (USER_SELECT.value === 'Elyas') return; // Only track history for rango mode
-            
+            if (USER_SELECT.value === 'Elyas') return;
             const currentState = getCurrentRangoState();
             historyStack.push(currentState);
-            if (historyStack.length > MAX_HISTORY_SIZE) {
-                historyStack.shift(); // Keep history size manageable
-            }
+            if (historyStack.length > MAX_HISTORY_SIZE) historyStack.shift();
             UNDO_BUTTON.disabled = false;
         }
 
@@ -734,13 +1226,10 @@
             }
             const previousState = historyStack.pop();
             populateRangoData(previousState);
-            saveData(); // Save the restored state
+            saveData();
             updateStatus('Undo successful.', false);
-            if (historyStack.length === 0) {
-                UNDO_BUTTON.disabled = true;
-            }
+            if (historyStack.length === 0) UNDO_BUTTON.disabled = true;
         }
-        // --- END UNDO FUNCTIONALITY ---
 
         function updateTally(inputElement, change) {
             let currentValue = parseInt(inputElement.value, 10) || 0;
@@ -753,13 +1242,10 @@
             const descInput = sectionEl.querySelector('.entry-desc');
             const valueInput = sectionEl.querySelector('.entry-value');
             const desc = descInput.value.trim();
-            
             if (!desc) return;
 
             const entryData = { desc };
-            if (valueInput) {
-                entryData.value = parseFloat(valueInput.value) || 0;
-            }
+            if (valueInput) entryData.value = parseFloat(valueInput.value) || 0;
             
             renderEntry(sectionEl, entryData);
             descInput.value = '';
@@ -776,15 +1262,12 @@
 
             if (entrySection) {
                 const list = entrySection.querySelector('.entry-list');
-                if (list) {
-                    list.innerHTML = '';
-                }
+                if (list) list.innerHTML = '';
                 updateSectionTotal(entrySection);
             } else if (socialSection) {
                 const content = socialSection.querySelector('#socialMediaContent');
                 content.querySelectorAll('input').forEach(input => input.value = '');
             }
-            
             saveData();
         }
 
@@ -840,10 +1323,7 @@
 
         function toggleEditState(item, saveIcon, editIcon) {
             const isEditing = item.classList.contains('is-editing');
-            
-            if (!isEditing) { // Before entering edit mode
-                pushStateToHistory();
-            }
+            if (!isEditing) pushStateToHistory();
 
             item.classList.toggle('is-editing');
             const descEl = item.querySelector('.desc');
@@ -852,24 +1332,18 @@
             const sectionEl = item.closest('.entry-section');
 
             if (item.classList.contains('is-editing')) {
-                // Switch to edit mode
                 const currentDesc = descEl.textContent;
                 const currentValue = valueEl ? parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,"")) : '';
-                
                 descEl.innerHTML = `<input type="text" class="form-element w-full px-2 py-1 text-sm" value="${currentDesc}">`;
                 if (valueEl) {
                     valueEl.innerHTML = `<input type="number" class="form-element w-24 px-2 py-1 text-sm" value="${currentValue}">`;
-                    // Add listener to update total as user types
                     valueEl.querySelector('input').addEventListener('input', () => updateSectionTotal(sectionEl));
                 }
                 editBtn.innerHTML = saveIcon;
                 editBtn.classList.add('save-btn');
-
             } else {
-                // Switch back to view mode
                 const newDesc = descEl.querySelector('input').value;
                 const newValueInput = valueEl ? valueEl.querySelector('input') : null;
-                
                 descEl.textContent = newDesc;
                 if (valueEl && newValueInput) {
                     const newValue = parseFloat(newValueInput.value) || 0;
@@ -886,22 +1360,15 @@
             pushStateToHistory();
             const oldSectionEl = item.closest('.entry-section');
             const currentSectionName = oldSectionEl.dataset.section;
-            
-            const funnel = {
-                potentialClients: 'soldCars',
-                soldCars: 'carsInShop'
-            };
-
+            const funnel = { potentialClients: 'soldCars', soldCars: 'carsInShop' };
             const targetSectionName = funnel[currentSectionName];
             if (!targetSectionName) return;
 
             const targetSectionEl = document.querySelector(`.entry-section[data-section="${targetSectionName}"]`);
-
             if (targetSectionEl) {
                 const desc = item.querySelector('.desc').textContent;
                 const valueEl = item.querySelector('.value');
                 const value = valueEl ? parseFloat(valueEl.textContent.replace(/[^0-9.-]+/g,"")) : 0;
-                
                 renderEntry(targetSectionEl, { desc, value });
                 item.remove();
                 updateSectionTotal(oldSectionEl);
@@ -914,7 +1381,6 @@
             const dateId = LOG_DATE_INPUT.value;
             if (!dateId || !db) return;
             
-            // Clear history when loading new data
             historyStack = [];
             UNDO_BUTTON.disabled = true;
 
@@ -927,7 +1393,7 @@
                     const userData = data[currentUser];
                     if (userData) populateForm(userData);
                 }
-                updateAllTotals(); // Ensure totals are correct on initial load
+                updateAllTotals();
             }, (error) => {
                 console.error("Error fetching document: ", error);
                 updateStatus("Error loading data.", true);
@@ -955,7 +1421,7 @@
             };
 
             if (currentUser !== 'Elyas') {
-                dataToSave.rangoData = getCurrentRangoState(); // Use the state capture function
+                dataToSave.rangoData = getCurrentRangoState();
             }
 
             try {
@@ -1009,7 +1475,7 @@
             ['potentialClients', 'soldCars', 'carsInShop'].forEach(sectionName => {
                 const sectionEl = document.querySelector(`.entry-section[data-section="${sectionName}"]`);
                 if (sectionEl && Array.isArray(rangoData[sectionName])) {
-                    sectionEl.querySelector('.entry-list').innerHTML = ''; // Clear existing entries
+                    sectionEl.querySelector('.entry-list').innerHTML = '';
                     rangoData[sectionName].forEach(entry => renderEntry(sectionEl, entry));
                 }
             });
@@ -1036,7 +1502,7 @@
         }
 
         async function handleLiveDieRepeat() {
-            pushStateToHistory(); // Save current state before overwriting
+            pushStateToHistory();
             const currentDateStr = LOG_DATE_INPUT.value;
             const currentDate = new Date(currentDateStr + 'T12:00:00');
             currentDate.setDate(currentDate.getDate() - 1);
@@ -1138,15 +1604,14 @@
 
             const textArea = document.createElement("textarea");
             textArea.value = message;
+            textArea.style.position = "fixed";
             textArea.style.top = "0";
             textArea.style.left = "0";
-            textArea.style.position = "fixed";
             document.body.appendChild(textArea);
             textArea.focus();
             textArea.select();
             try {
-                const successful = document.execCommand('copy');
-                if (successful) {
+                if (document.execCommand('copy')) {
                     updateStatus('Summary copied to clipboard!', false);
                 } else {
                     updateStatus('Failed to copy.', true);
@@ -1158,95 +1623,167 @@
             document.body.removeChild(textArea);
         }
         
-        async function handleExport() {
+        async function getReportData() {
             const startDate = document.getElementById('startDate').value;
             const endDate = document.getElementById('endDate').value;
+            const currentUser = USER_SELECT.value;
 
-            if (!startDate || !endDate) {
-                updateStatus('Please select a start and end date.', true);
-                return;
-            }
-            if (startDate > endDate) {
-                updateStatus('Start date cannot be after end date.', true);
-                return;
+            if (!startDate || !endDate || startDate > endDate) {
+                updateStatus('Please select a valid date range.', true);
+                return null;
             }
 
-            updateStatus('Exporting...', false, true);
+            const logsRef = collection(db, 'activity_logs');
+            const q = query(logsRef, where(documentId(), '>=', startDate), where(documentId(), '<=', endDate));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                updateStatus('No data found for the selected range.', false);
+                return null;
+            }
             
-            try {
-                const logsRef = collection(db, 'activity_logs');
-                const q = query(logsRef, where(documentId(), '>=', startDate), where(documentId(), '<=', endDate));
-                const querySnapshot = await getDocs(q);
+            let dataForExport = [["Date", "User", "Category", "Item", "Description", "Value"]];
 
-                if (querySnapshot.empty) {
-                    updateStatus('No data found for the selected range.', false);
-                    return;
-                }
-                
-                let csvContent = "Date,User,Category,Item,Description,Value\n";
-                
-                const escapeCsvCell = (cell) => {
-                    if (cell === undefined || cell === null) return '';
-                    const str = String(cell);
-                    if (str.includes(',')) return `"${str.replace(/"/g, '""')}"`;
-                    return str;
-                };
+            querySnapshot.forEach(doc => {
+                const date = doc.id;
+                const data = doc.data();
+                const log = data[currentUser]; // Only get data for the currently selected user
 
-                querySnapshot.forEach(doc => {
-                    const date = doc.id;
-                    const data = doc.data();
-                    
-                    for (const user in data) {
-                        const log = data[user];
-                        
-                        if (log.activities) {
-                            for(const time in log.activities) {
-                                if(log.activities[time]) {
-                                    csvContent += `${date},${user},Hourly Activity,${time},${escapeCsvCell(log.activities[time])},\n`;
-                                }
+                if (log) {
+                    if (log.activities) {
+                        for(const time in log.activities) {
+                            if(log.activities[time]) {
+                                dataForExport.push([date, currentUser, 'Hourly Activity', time, log.activities[time], '']);
                             }
                         }
-                        
-                        if (log.rangoData) {
-                            const rd = log.rangoData;
-                            if (rd.metrics) {
-                                csvContent += `${date},${user},Metric,New Leads Contacted,,${rd.metrics.newLeads || 0}\n`;
-                                csvContent += `${date},${user},Metric,Estimates Given,,${rd.metrics.estimatesGiven || 0}\n`;
-                            }
-                            if (rd.potentialClients) rd.potentialClients.forEach(item => csvContent += `${date},${user},Potential Client,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
-                            if (rd.soldCars) rd.soldCars.forEach(item => csvContent += `${date},${user},Sold - Car Coming,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
-                            if (rd.carsInShop) rd.carsInShop.forEach(item => csvContent += `${date},${user},Cars in Shop,${escapeCsvCell(item.desc)},,${item.value || 0}\n`);
-                            if (rd.socialMedia) {
-                                for(const item in rd.socialMedia) {
-                                    if(rd.socialMedia[item]) {
-                                        csvContent += `${date},${user},Social Media,${escapeCsvCell(item)},${escapeCsvCell(rd.socialMedia[item])},\n`;
-                                    }
+                    }
+                    if (log.rangoData) {
+                        const rd = log.rangoData;
+                        if (rd.metrics) {
+                            dataForExport.push([date, currentUser, 'Metric', 'New Leads Contacted', '', rd.metrics.newLeads || 0]);
+                            dataForExport.push([date, currentUser, 'Metric', 'Estimates Given', '', rd.metrics.estimatesGiven || 0]);
+                        }
+                        if (rd.potentialClients) rd.potentialClients.forEach(item => dataForExport.push([date, currentUser, 'Potential Client', '', item.desc, item.value || 0]));
+                        if (rd.soldCars) rd.soldCars.forEach(item => dataForExport.push([date, currentUser, 'Sold - Car Coming', '', item.desc, item.value || 0]));
+                        if (rd.carsInShop) rd.carsInShop.forEach(item => dataForExport.push([date, currentUser, 'Cars in Shop', '', item.desc, item.value || 0]));
+                        if (rd.socialMedia) {
+                            for(const item in rd.socialMedia) {
+                                if(rd.socialMedia[item]) {
+                                    dataForExport.push([date, currentUser, 'Social Media', item, rd.socialMedia[item], '']);
                                 }
                             }
                         }
                     }
-                });
+                }
+            });
+            return dataForExport;
+        }
 
-                const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement("a");
-                const url = URL.createObjectURL(blob);
-                link.setAttribute("href", url);
-                link.setAttribute("download", `activity_log_${startDate}_to_${endDate}.csv`);
-                link.style.visibility = 'hidden';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
+        async function handleExport() {
+            updateStatus('Exporting...', false, true);
+            try {
+                const dataForExport = await getReportData();
+                if (!dataForExport) return;
+
+                const ws = XLSX.utils.aoa_to_sheet(dataForExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Activity Log");
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                XLSX.writeFile(wb, `activity_log_${USER_SELECT.value}_${startDate}_to_${endDate}.xlsx`);
 
                 updateStatus('Export successful!', false);
-                EXPORT_MODAL.classList.add('hidden');
-
             } catch (error) {
                 console.error("Error exporting data: ", error);
                 updateStatus('Export failed.', true);
             }
         }
+
+        async function handleGenerateReport() {
+            REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>Generating report, please wait... This may take a moment.</p></div>`;
+            REPORT_HEADER.classList.add('hidden');
+            try {
+                const dataRows = await getReportData();
+                if (!dataRows || dataRows.length <= 1) {
+                    REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>Not enough data to generate a report.</p></div>`;
+                    return;
+                }
+
+                const analysis = analyzeData(dataRows);
+                
+                REPORT_OUTPUT.innerHTML = renderGeneratedReport(analysis);
+                REPORT_HEADER.classList.remove('hidden');
+
+            } catch(e) {
+                console.error("Error generating report:", e);
+                REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>An error occurred while generating the report.</p></div>`;
+            }
+        }
         
-        // Cookie helper functions
+        function handleCopyReport() {
+            const reportEl = document.getElementById('reportOutput');
+            let textToCopy = '';
+            
+            const title = reportEl.querySelector('h3').innerText;
+            textToCopy += `*${title}*\n\n`;
+
+            reportEl.querySelectorAll('li').forEach(li => {
+                textToCopy += `- ${li.innerText}\n`;
+            });
+
+            const link = window.location.href;
+            const pin = '9453';
+            textToCopy += `\nView full history: ${link}\nPIN: ${pin}`;
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy.trim();
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            updateStatus('Report copied to clipboard!', false);
+        }
+
+        function analyzeData(rows) {
+            const data = rows.slice(1);
+            const analysis = { keyMetrics: {} };
+            
+            const valueSumByCategory = (category) => data.filter(r => r[2] === category).reduce((sum, r) => sum + (Number(r[5]) || 0), 0);
+            const valueSumByItem = (item) => data.filter(r => r[3] === item).reduce((sum, r) => sum + (Number(r[5]) || 0), 0);
+            
+            analysis.keyMetrics.totalLeads = valueSumByItem('New Leads Contacted');
+            analysis.keyMetrics.totalEstimates = valueSumByItem('Estimates Given');
+            analysis.keyMetrics.totalPotentialValue = valueSumByCategory('Potential Client');
+            analysis.keyMetrics.totalSoldValue = valueSumByCategory('Sold - Car Coming');
+            analysis.keyMetrics.totalInShopValue = valueSumByCategory('Cars in Shop');
+            
+            return analysis;
+        }
+
+        function renderGeneratedReport(analysis) {
+            const formatCurrency = (num) => num.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            return `
+                <div class="report-card">
+                    <h3>Rango Overview Report for ${startDate} to ${endDate}</h3>
+                    <ul>
+                        <li>Total Leads Contacted: ${analysis.keyMetrics.totalLeads}</li>
+                        <li>Total Estimates Given: ${analysis.keyMetrics.totalEstimates}</li>
+                        <li>Potential Client Value: ${formatCurrency(analysis.keyMetrics.totalPotentialValue)}</li>
+                        <li>Sold Value: ${formatCurrency(analysis.keyMetrics.totalSoldValue)}</li>
+                        <li>In-Shop Value: ${formatCurrency(analysis.keyMetrics.totalInShopValue)}</li>
+                    </ul>
+                    <p class="text-xs mt-4" style="color: var(--color-text-muted);">
+                        <a href="${window.location.href}" target="_blank" style="color: var(--color-secondary);">View Full History</a> | PIN: 9453
+                    </p>
+                </div>
+            `;
+        }
+        
+        // --- UTILITY FUNCTIONS ---
         function setCookie(name, value, days) {
             let expires = "";
             if (days) {
