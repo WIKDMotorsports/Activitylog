@@ -16,10 +16,12 @@
             --color-text-muted: #a1a1aa;
             --color-primary: #FF3B30;
             --color-secondary: #3b82f6; /* Blue for AE tool buttons */
+            --color-success: #22c55e; /* Green for AE tool */
+            --color-info: #a855f7; /* Purple/Indigo for AE tool */
             --color-surface: #141414;
+            --color-surface-darker: #0A0A0A;
             --color-border: #2A2A2A;
             --color-danger: #ef4444;
-            --color-success: #34d399;
             --font-heading: 'Rajdhani', sans-serif;
             --font-body: 'Inter', sans-serif;
         }
@@ -85,12 +87,14 @@
         .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
         .gap-2 { gap: 0.5rem; }
         .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
         .flex { display: flex; }
         .items-center { align-items: center; }
         .justify-between { justify-content: space-between; }
         .justify-center { justify-content: center; }
         .flex-shrink-0 { flex-shrink: 0; }
         .flex-grow { flex-grow: 1; }
+        @media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
         @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sm\:flex-row { flex-direction: row; } }
         .form-element {
             background-color: var(--color-surface);
@@ -138,26 +142,6 @@
             border-color: var(--color-primary);
         }
         .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
-        
-        /* Styles for AE Tool buttons */
-        .btn-ae-primary {
-            background-color: var(--color-secondary);
-            color: white;
-            border-color: var(--color-secondary);
-        }
-        .btn-ae-primary:hover:not(:disabled) {
-            background-color: #2563eb;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
-        }
-        .btn-ae-secondary {
-            background-color: var(--color-surface);
-            color: var(--color-text-muted);
-            border-color: var(--color-border);
-        }
-        .btn-ae-secondary:hover:not(:disabled) { background-color: #2a2a2a; border-color: #4a4a4a; color: var(--color-text); }
-
-
         .btn-clear-section {
             background: none; border: none; color: var(--color-text-muted); cursor: pointer;
             font-size: 0.75rem; font-weight: 500; text-transform: uppercase; padding: 0.25rem 0.5rem;
@@ -301,26 +285,7 @@
             padding: 1.5rem;
             padding-top: 0;
         }
-        #aeScriptOutput {
-            background-color: var(--color-background);
-            border: 1px solid var(--color-border);
-            border-radius: 0.5rem;
-            padding: 1rem;
-            max-height: 24rem;
-            overflow-y: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
-            color: #fef08a; /* yellow-200 */
-            font-family: monospace;
-            font-size: 0.875rem;
-        }
         
-        /* Custom scrollbar for AE output */
-        #aeScriptOutput::-webkit-scrollbar { width: 8px; }
-        #aeScriptOutput::-webkit-scrollbar-track { background: #1a1a1a; }
-        #aeScriptOutput::-webkit-scrollbar-thumb { background: #4a4a4a; border-radius: 4px; }
-        #aeScriptOutput::-webkit-scrollbar-thumb:hover { background: #6a6a6a; }
-
         /* Iframe container for responsive embed */
         .iframe-container {
             position: relative;
@@ -367,6 +332,84 @@
         .report-card li {
             margin-bottom: 0.25rem;
         }
+
+        /* --- AE IMPORT TOOL STYLES --- */
+        .ae-form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: var(--color-text-muted);
+            margin-bottom: 0.5rem;
+        }
+        .ae-input, .ae-select {
+            width: 100%;
+            background-color: var(--color-surface-darker);
+            border: 1px solid var(--color-border);
+            border-radius: 0.5rem;
+            padding: 0.65rem 1rem;
+            font-size: 0.875rem;
+            transition: all 0.2s ease-in-out;
+        }
+        .ae-input:focus, .ae-select:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--color-secondary);
+            border-color: var(--color-secondary);
+        }
+        .ae-textarea {
+            min-height: 10rem;
+            resize: vertical;
+        }
+        .ae-textarea::-webkit-scrollbar { width: 8px; }
+        .ae-textarea::-webkit-scrollbar-track { background: var(--color-surface); }
+        .ae-textarea::-webkit-scrollbar-thumb { background-color: #4a4a4a; border-radius: 4px; }
+        .ae-btn {
+            width: 100%;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 1rem;
+            text-transform: uppercase;
+            border-radius: 8px;
+            padding: 10px 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+            color: white;
+        }
+        .ae-btn-primary { background-color: var(--color-success); border-color: var(--color-success); }
+        .ae-btn-primary:hover:not(:disabled) { background-color: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); }
+        .ae-btn-secondary { background-color: var(--color-info); border-color: var(--color-info); }
+        .ae-btn-secondary:hover:not(:disabled) { background-color: #9333ea; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2); }
+        .ae-file-input {
+            font-size: 0.875rem;
+            color: var(--color-text-muted);
+        }
+        .ae-file-input::file-selector-button {
+            margin-right: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            border: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: var(--color-secondary);
+            color: white;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .ae-file-input::file-selector-button:hover { background-color: #2563eb; }
+        .divider-text {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            color: var(--color-text-muted);
+            font-size: 0.875rem;
+        }
+        .divider-text::before, .divider-text::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--color-border);
+        }
+        .divider-text:not(:empty)::before { margin-right: .5em; }
+        .divider-text:not(:empty)::after { margin-left: .5em; }
     </style>
 </head>
 <body class="antialiased">
@@ -523,73 +566,72 @@
                 </div>
 
                 <div id="toolsTab" class="tab-content">
-                    <!-- AE Script Generator Tool -->
+                    <!-- AE Batch Import Script Generator Tool -->
                     <div class="tool-section">
                         <div class="tool-header">
                             <div>
-                                <h2>AE Batch Replace Script Generator</h2>
-                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Specifically for the Performance Packages Meta Ads.</p>
+                                <h2>AE Batch Import Script Generator</h2>
+                                <p class="text-xs mt-1" style="color: var(--color-text-muted); font-weight: 400; font-family: var(--font-body);">Create a custom After Effects script to import your footage instantly.</p>
                             </div>
                             <span class="toggle-icon">&#9660;</span> <!-- Down arrow -->
                         </div>
                         <div class="tool-content">
                             <div class="space-y-6">
-                                <!-- Step 1: Choose Footage Pack -->
-                                <div class="space-y-2">
-                                    <label for="footagePack" class="block font-semibold text-sm" style="color: var(--color-text-muted);">1. Choose Footage Source</label>
-                                    <select id="footagePack" class="form-element w-full px-4 py-3">
-                                        <option value="custom">Custom List</option>
-                                        <option value="blackwing">Blackwing Footage Pack</option>
-                                    </select>
+                                <!-- Preset Loader Section -->
+                                <div class="border-t border-b border-border py-4">
+                                    <label class="block text-sm font-semibold text-center text-white mb-3">Load a Preset Pack</label>
+                                    <button id="load-preset-btn" class="ae-btn ae-btn-secondary">
+                                        Load Blackwing Preset Pack
+                                    </button>
                                 </div>
 
-                                <!-- Step 2: Paste File Paths -->
-                                <div class="space-y-2">
-                                    <label for="filePaths" class="block font-semibold text-sm" style="color: var(--color-text-muted);">2. Paste File Paths (one per line)</label>
-                                    <textarea id="filePaths" rows="8" class="form-element w-full px-4 py-3" placeholder="\\server\share\file1.mov&#10;\\server\share\file2.mp4&#10;C:\Users\YourName\Videos\clip3.mkv"></textarea>
-                                </div>
+                                <!-- Input Section: Paste or Upload -->
+                                <div class="space-y-4">
+                                    <label for="file-list" class="ae-form-label">1. File Paths (one per line)</label>
+                                    <textarea id="file-list" rows="8" class="ae-input ae-textarea" placeholder="\\server\path\to\file1.mov&#10;\\server\path\to\file2.mp4&#10;C:\Users\YourName\Desktop\video.mkv"></textarea>
+                                    
+                                    <div class="divider-text">OR</div>
 
-                                <!-- Step 3: Choose Script Type -->
-                                <div class="space-y-2">
-                                    <label class="block font-semibold text-sm" style="color: var(--color-text-muted);">3. Choose Script Type</label>
-                                    <div class="flex flex-col sm:flex-row gap-4">
-                                        <label class="flex-grow p-4 rounded-lg border has-[:checked]:border-secondary has-[:checked]:bg-gray-900 transition cursor-pointer" style="background-color: #0A0A0A; border-color: var(--color-border);">
-                                            <input type="radio" name="scriptType" value="project" class="hidden" checked>
-                                            <div class="flex flex-col">
-                                                <span class="font-bold text-white">Replace in Project Panel</span>
-                                                <span class="text-sm" style="color: var(--color-text-muted);">Replaces selected footage items in the project browser.</span>
-                                            </div>
-                                        </label>
-                                        <label class="flex-grow p-4 rounded-lg border has-[:checked]:border-secondary has-[:checked]:bg-gray-900 transition cursor-pointer" style="background-color: #0A0A0A; border-color: var(--color-border);">
-                                            <input type="radio" name="scriptType" value="layers" class="hidden">
-                                             <div class="flex flex-col">
-                                                <span class="font-bold text-white">Replace Selected Layers</span>
-                                                <span class="text-sm" style="color: var(--color-text-muted);">Replaces selected layers in the active composition.</span>
-                                            </div>
-                                        </label>
+                                    <div>
+                                        <label for="file-upload" class="ae-form-label">Upload a .txt file</label>
+                                        <input type="file" id="file-upload" accept=".txt" class="ae-file-input w-full">
                                     </div>
                                 </div>
 
-                                <!-- Generate Button -->
-                                <button id="generateBtn" class="btn btn-ae-primary w-full text-lg">
-                                    Generate Script
-                                </button>
-
-                                <!-- Output Section -->
-                                <div id="outputContainer" class="hidden mt-6 space-y-4">
-                                    <div class="flex flex-wrap justify-between items-center gap-4">
-                                        <h3 class="text-xl font-semibold text-white">Generated Script</h3>
-                                        <div class="flex gap-2">
-                                             <button id="copyBtn" class="btn btn-ae-secondary py-2 px-4 text-sm uppercase">
-                                                Copy
-                                            </button>
-                                            <button id="downloadBtn" class="btn py-2 px-4 text-sm uppercase" style="background-color: #166534; color: white; border-color: #166534;">
-                                                Download .jsx
-                                            </button>
-                                        </div>
+                                <!-- Configuration Section -->
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label for="folder-name" class="ae-form-label">2. Project Folder Name</label>
+                                        <input type="text" id="folder-name" value="Imported Footage" class="ae-input">
                                     </div>
-                                    <pre id="aeScriptOutput"><code></code></pre>
-                                    <div id="copy-success" class="text-center font-medium hidden" style="color: var(--color-success);">Copied to clipboard!</div>
+                                    <div>
+                                        <label for="label-color" class="ae-form-label">3. Folder Label Color</label>
+                                        <select id="label-color" class="ae-select">
+                                            <option value="1">Red</option>
+                                            <option value="2">Yellow</option>
+                                            <option value="3">Aqua</option>
+                                            <option value="4" selected>Blue</option>
+                                            <option value="5">Lavender</option>
+                                            <option value="6">Peach</option>
+                                            <option value="7">Sea Foam</option>
+                                            <option value="8">Purple</option>
+                                            <option value="9">Orange</option>
+                                            <option value="10">Green</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <!-- Output Filename Section -->
+                                <div>
+                                    <label for="output-filename" class="ae-form-label">4. Script Filename</label>
+                                    <input type="text" id="output-filename" class="ae-input">
+                                </div>
+
+                                <!-- Action Button -->
+                                <div class="pt-2">
+                                    <button id="generate-import-btn" class="ae-btn ae-btn-primary text-lg">
+                                        Generate & Download Script
+                                    </button>
                                 </div>
                             </div>
                         </div>
@@ -797,7 +839,7 @@
             USER_SELECT.value = 'rango';
             handleUserChange();
             setupEventListeners();
-            setupAETool(); // Initialize the new tool
+            setupAEImportTool(); // Initialize the new tool
             loadDataForCurrentDate();
         }
 
@@ -914,9 +956,10 @@
             });
         }
 
-        // --- AE SCRIPT GENERATOR LOGIC ---
-        function setupAETool() {
-            const blackwingFootagePack = [
+        // --- AE BATCH IMPORT SCRIPT GENERATOR LOGIC ---
+        function setupAEImportTool() {
+            // --- PRESET DATA ---
+            const blackwingPresetPaths = [
                 "\\\\192.168.1.207\\DaleG\\2025\\1-7\\blackwing v idle.mp4",
                 "\\\\192.168.1.207\\DaleG\\2025\\1-6\\blackwing idle 3.mp4",
                 "\\\\192.168.1.207\\DaleG\\2025\\1-6\\blackwing idle 2.mp4",
@@ -962,195 +1005,144 @@
                 "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1696.MOV"
             ];
 
-            const footagePackSelect = document.getElementById('footagePack');
-            const filePathsTextarea = document.getElementById('filePaths');
-            const generateBtn = document.getElementById('generateBtn');
-            const outputContainer = document.getElementById('outputContainer');
-            const scriptOutput = document.getElementById('aeScriptOutput').querySelector('code');
-            const copyBtn = document.getElementById('copyBtn');
-            const downloadBtn = document.getElementById('downloadBtn');
-            const copySuccessMessage = document.getElementById('copy-success');
+            // --- DOM ELEMENT REFERENCES ---
+            const fileListTextarea = document.getElementById('file-list');
+            const fileUploadInput = document.getElementById('file-upload');
+            const folderNameInput = document.getElementById('folder-name');
+            const labelColorSelect = document.getElementById('label-color');
+            const outputFilenameInput = document.getElementById('output-filename');
+            const generateBtn = document.getElementById('generate-import-btn');
+            const loadPresetBtn = document.getElementById('load-preset-btn');
 
-            footagePackSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'blackwing') {
-                    filePathsTextarea.value = blackwingFootagePack.join('\n');
-                } else {
-                    filePathsTextarea.value = '';
+            // --- CORE FUNCTIONS ---
+            function loadBlackwingPreset() {
+                fileListTextarea.value = blackwingPresetPaths.join('\n');
+                folderNameInput.value = 'Blackwing Footage';
+            }
+
+            function generateDefaultFilename() {
+                const now = new Date();
+                const year = now.getFullYear();
+                const month = String(now.getMonth() + 1).padStart(2, '0');
+                const day = String(now.getDate()).padStart(2, '0');
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                return `import_preset_${year}${month}${day}_${hours}${minutes}${seconds}.jsx`;
+            }
+
+            function handleFileUpload(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    fileListTextarea.value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+
+            function generateScriptContent() {
+                const folderName = folderNameInput.value.trim();
+                const labelColor = labelColorSelect.value;
+                const filePathsRaw = fileListTextarea.value.trim();
+
+                if (!filePathsRaw) {
+                    alert("Please paste or upload a list of file paths.");
+                    return null;
                 }
-            });
 
-            generateBtn.addEventListener('click', () => {
-                const paths = filePathsTextarea.value.split('\n')
-                    .map(p => p.trim().replace(/['"]+/g, ''))
-                    .filter(p => p.length > 0);
+                const filesToImportArray = filePathsRaw
+                    .split('\n')
+                    .map(path => path.trim())
+                    .filter(path => path.length > 0)
+                    .map(path => `"${path.replace(/\\/g, '\\\\')}"`);
 
-                if (paths.length === 0) {
-                    // Replace alert with a more modern notification if desired
-                    alert('Please provide at least one file path.');
-                    return;
+                if (filesToImportArray.length === 0) {
+                    alert("The file list is empty or contains only whitespace.");
+                    return null;
                 }
 
-                const scriptType = document.querySelector('input[name="scriptType"]:checked').value;
-                const generatedScript = scriptType === 'project' 
-                    ? generateProjectReplaceScript(paths) 
-                    : generateLayerReplaceScript(paths);
+                const filesToImportString = filesToImportArray.join(',\n        ');
 
-                scriptOutput.textContent = generatedScript;
-                outputContainer.classList.remove('hidden');
-                copySuccessMessage.classList.add('hidden');
-                copyBtn.textContent = 'Copy';
-            });
+                return `/* After Effects Batch Import Script 
+    Generated by the AE Script Generator Tool 
+
+    Instructions: 
+    1. In After Effects, go to File > Scripts > Run Script File... 
+    2. Select this .jsx file. 
+*/ 
+
+(function batchImport() { 
+    // --- SCRIPT CONFIGURATION --- 
+    var folderName = "${folderName}"; 
+    var folderLabelColor = ${labelColor}; 
+    var filesToImport = [ 
+        ${filesToImportString} 
+    ]; 
+
+    // --- SCRIPT LOGIC --- 
+    app.beginUndoGroup("Batch Import Files"); 
+    try { 
+        var footageFolder = null; 
+        for (var i = 1; i <= app.project.numItems; i++) { 
+            if ((app.project.item(i) instanceof FolderItem) && (app.project.item(i).name === folderName)) { 
+                footageFolder = app.project.item(i); 
+                break; 
+            } 
+        } 
+
+        if (footageFolder === null) { 
+            footageFolder = app.project.items.addFolder(folderName); 
+        } 
+
+        footageFolder.label = folderLabelColor; 
+
+        for (var j = 0; j < filesToImport.length; j++) { 
+            var filePath = filesToImport[j]; 
+            var currentFile = new File(filePath); 
+            if (currentFile.exists) { 
+                try { 
+                    var importOptions = new ImportOptions(currentFile); 
+                    var importedItem = app.project.importFile(importOptions); 
+                    importedItem.parentFolder = footageFolder; 
+                } catch (e) { 
+                    alert("Error importing file: " + filePath + "\\n" + e.toString()); 
+                } 
+            } else { 
+                alert("File not found at path: " + filePath); 
+            } 
+        } 
+        alert("Batch import complete! " + filesToImport.length + " files processed."); 
+    } catch (e) { 
+        alert("An error occurred: " + e.toString()); 
+    } finally { 
+        app.endUndoGroup(); 
+    } 
+})();`;
+            }
             
-            copyBtn.addEventListener('click', () => {
-                const textToCopy = scriptOutput.textContent;
-                const tempTextArea = document.createElement('textarea');
-                tempTextArea.value = textToCopy;
-                document.body.appendChild(tempTextArea);
-                tempTextArea.select();
-                
-                try {
-                    document.execCommand('copy');
-                    copyBtn.textContent = 'Copied!';
-                    copySuccessMessage.classList.remove('hidden');
-                } catch (err) {
-                    console.error('Failed to copy text: ', err);
-                    copyBtn.textContent = 'Copy Failed';
-                }
-                
-                document.body.removeChild(tempTextArea);
-            });
+            function downloadScript() {
+                const scriptContent = generateScriptContent();
+                if (!scriptContent) return;
 
-            downloadBtn.addEventListener('click', () => {
-                const scriptContent = scriptOutput.textContent;
-                if (!scriptContent) {
-                    alert('Please generate a script first.');
-                    return;
-                }
-                const blob = new Blob([scriptContent], { type: 'text/plain' });
+                const filename = outputFilenameInput.value.trim() || generateDefaultFilename();
+                const blob = new Blob([scriptContent], { type: 'text/javascript' });
                 const url = URL.createObjectURL(blob);
+                
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'ae_batch_replace.jsx';
+                a.download = filename.endsWith('.jsx') ? filename : `${filename}.jsx`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-            });
-
-            function formatPathsForScript(paths) {
-                return paths.map(p => `"${p.replace(/\\/g, '\\\\')}"`).join(',\n        ');
             }
 
-            function generateProjectReplaceScript(paths) {
-                const formattedPaths = formatPathsForScript(paths);
-                return `// After Effects Script: Replace Footage in Project Panel
-// How to use:
-// 1. Save this file with a .jsx extension.
-// 2. In After Effects, select the footage items in the Project Panel in the order you want them replaced.
-// 3. Go to File > Scripts > Run Script File... and select this .jsx file.
-
-(function replaceProjectFootage() {
-    var newFilePaths = [
-        ${formattedPaths}
-    ];
-
-    app.beginUndoGroup("Batch Replace Project Footage");
-
-    try {
-        var selectedItems = app.project.selection;
-        var footageItems = [];
-
-        for (var i = 0; i < selectedItems.length; i++) {
-            if (selectedItems[i] instanceof FootageItem) {
-                footageItems.push(selectedItems[i]);
-            }
-        }
-
-        if (footageItems.length === 0) {
-            alert("Please select one or more footage items in the Project panel.");
-            return;
-        }
-
-        if (newFilePaths.length !== footageItems.length) {
-            alert("Error: The number of file paths (" + newFilePaths.length + ") does not match the number of selected footage items (" + footageItems.length + ").");
-            return;
-        }
-
-        for (var j = 0; j < footageItems.length; j++) {
-            var currentItem = footageItems[j];
-            var newFile = new File(newFilePaths[j]);
-
-            if (newFile.exists) {
-                currentItem.replace(newFile);
-            } else {
-                alert("Skipping: File not found at path:\\n" + newFilePaths[j]);
-            }
-        }
-        alert("Replacement complete! " + footageItems.length + " footage items have been updated.");
-
-    } catch (e) {
-        alert("An error occurred: " + e.toString());
-    } finally {
-        app.endUndoGroup();
-    }
-})();`;
-            }
-            
-            function generateLayerReplaceScript(paths) {
-                const formattedPaths = formatPathsForScript(paths);
-                return `// After Effects Script: Replace Selected Layers in Composition
-// How to use:
-// 1. Save this file with a .jsx extension.
-// 2. In After Effects, open your composition and select the layers in the timeline in the order you want them replaced.
-// 3. Go to File > Scripts > Run Script File... and select this .jsx file.
-
-(function replaceLayerFootage() {
-    var newFilePaths = [
-        ${formattedPaths}
-    ];
-
-    app.beginUndoGroup("Batch Replace Layer Sources");
-
-    try {
-        var comp = app.project.activeItem;
-        if (!(comp instanceof CompItem)) {
-            alert("Please select a composition first.");
-            return;
-        }
-
-        var selectedLayers = comp.selectedLayers;
-        if (selectedLayers.length === 0) {
-            alert("Please select the layers you want to replace in the timeline.");
-            return;
-        }
-
-        if (newFilePaths.length !== selectedLayers.length) {
-            alert("Error: The number of file paths (" + newFilePaths.length + ") does not match the number of selected layers (" + selectedLayers.length + ").");
-            return;
-        }
-
-        for (var i = 0; i < selectedLayers.length; i++) {
-            var layer = selectedLayers[i];
-            var newFile = new File(newFilePaths[i]);
-
-            if (!newFile.exists) {
-                alert("Skipping: File not found at path:\\n" + newFilePaths[i]);
-                continue;
-            }
-
-            var importOptions = new ImportOptions(newFile);
-            var newFootageItem = app.project.importFile(importOptions);
-            layer.replaceSource(newFootageItem, true);
-        }
-        alert("Replacement complete! " + selectedLayers.length + " layers have been updated.");
-
-    } catch (e) {
-        alert("An error occurred: " + e.toString());
-    } finally {
-        app.endUndoGroup();
-    }
-})();`;
-            }
+            // --- INITIALIZATION ---
+            outputFilenameInput.value = generateDefaultFilename();
+            fileUploadInput.addEventListener('change', handleFileUpload);
+            generateBtn.addEventListener('click', downloadScript);
+            loadPresetBtn.addEventListener('click', loadBlackwingPreset);
         }
 
         // --- LOGGER CORE LOGIC (Data, UI, etc.) ---
