@@ -1496,14 +1496,27 @@
         async function handleLiveDieRepeat() {
             pushStateToHistory();
             const currentDateStr = LOG_DATE_INPUT.value;
-            const currentDate = new Date(currentDateStr + 'T12:00:00');
-            currentDate.setDate(currentDate.getDate() - 1);
+            const currentDate = new Date(currentDateStr + 'T12:00:00'); // Use a fixed time to avoid timezone issues
+            const dayOfWeek = currentDate.getDay(); // Sunday is 0, Monday is 1
+
+            let daysToSubtract = 1;
+            if (dayOfWeek === 1) { // If it's Monday
+                daysToSubtract = 3; // Go back to Friday
+            } else if (dayOfWeek === 0) { // If it's Sunday
+                daysToSubtract = 2; // Go back to Friday
+            }
+            // For Saturday (6), it will correctly subtract 1 to get Friday.
+            // For other weekdays, it will subtract 1.
+
+            currentDate.setDate(currentDate.getDate() - daysToSubtract);
             const prevDateStr = currentDate.toISOString().slice(0, 10);
             
+            const previousDayName = (daysToSubtract > 1) ? 'Friday\'s' : 'yesterday\'s';
+
             const currentUser = USER_SELECT.value;
             if (!currentUser || !db) return;
 
-            updateStatus('Loading yesterday\'s data...', false, true);
+            updateStatus(`Loading ${previousDayName} data...`, false, true);
 
             try {
                 const docRef = doc(db, "activity_logs", prevDateStr);
@@ -1515,16 +1528,18 @@
                     if (userData && userData.rangoData) {
                         populateRangoData(userData.rangoData);
                         await saveData();
-                        updateStatus('Yesterday\'s data copied and saved!', false);
+                        // Capitalize the first letter of the day name for the status message
+                        const capitalizedDayName = previousDayName.charAt(0).toUpperCase() + previousDayName.slice(1);
+                        updateStatus(`${capitalizedDayName} data copied and saved!`, false);
                     } else {
                         updateStatus(`No data found for ${currentUser} on ${prevDateStr}.`, false);
                     }
                 } else {
-                    updateStatus(`No log found for yesterday (${prevDateStr}).`, false);
+                    updateStatus(`No log found for the previous workday (${prevDateStr}).`, false);
                 }
             } catch (error) {
                 console.error("Error in Live, Die, Repeat:", error);
-                updateStatus('Failed to load yesterday\'s data.', true);
+                updateStatus(`Failed to load data from ${prevDateStr}.`, true);
             }
         }
 
