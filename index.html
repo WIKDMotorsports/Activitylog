@@ -109,6 +109,21 @@
             border-color: var(--color-primary);
         }
         .form-element::placeholder { color: var(--color-text-muted); }
+        .form-element[type="file"]::file-selector-button {
+            margin-right: 1rem;
+            padding: 0.65rem 1rem;
+            border-radius: 0.5rem;
+            border: 0;
+            font-size: 0.875rem;
+            font-weight: 600;
+            background-color: var(--color-secondary);
+            color: white;
+            transition: background-color 0.2s;
+            cursor: pointer;
+        }
+        .form-element[type="file"]::file-selector-button:hover {
+             background-color: #2563eb;
+        }
         .btn {
             font-family: var(--font-heading);
             font-weight: 600;
@@ -142,6 +157,26 @@
             border-color: var(--color-primary);
         }
         .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
+        .btn-success {
+            background-color: var(--color-success);
+            color: white;
+            border-color: var(--color-success);
+        }
+        .btn-success:hover:not(:disabled) {
+            background-color: #16a34a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(34, 197, 94, 0.3);
+        }
+        .btn-info {
+            background-color: var(--color-info);
+            color: white;
+            border-color: var(--color-info);
+        }
+        .btn-info:hover:not(:disabled) {
+            background-color: #9333ea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
         .btn-clear-section {
             background: none; border: none; color: var(--color-text-muted); cursor: pointer;
             font-size: 0.75rem; font-weight: 500; text-transform: uppercase; padding: 0.25rem 0.5rem;
@@ -333,69 +368,6 @@
             margin-bottom: 0.25rem;
         }
 
-        /* --- AE IMPORT TOOL STYLES --- */
-        .ae-form-label {
-            display: block;
-            font-size: 0.875rem;
-            font-weight: 500;
-            color: var(--color-text-muted);
-            margin-bottom: 0.5rem;
-        }
-        .ae-input, .ae-select {
-            width: 100%;
-            background-color: var(--color-surface-darker);
-            border: 1px solid var(--color-border);
-            border-radius: 0.5rem;
-            padding: 0.65rem 1rem;
-            font-size: 0.875rem;
-            transition: all 0.2s ease-in-out;
-        }
-        .ae-input:focus, .ae-select:focus {
-            outline: none;
-            box-shadow: 0 0 0 2px var(--color-secondary);
-            border-color: var(--color-secondary);
-        }
-        .ae-textarea {
-            min-height: 10rem;
-            resize: vertical;
-        }
-        .ae-textarea::-webkit-scrollbar { width: 8px; }
-        .ae-textarea::-webkit-scrollbar-track { background: var(--color-surface); }
-        .ae-textarea::-webkit-scrollbar-thumb { background-color: #4a4a4a; border-radius: 4px; }
-        .ae-btn {
-            width: 100%;
-            font-family: var(--font-heading);
-            font-weight: 600;
-            font-size: 1rem;
-            text-transform: uppercase;
-            border-radius: 8px;
-            padding: 10px 20px;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            border: 1px solid transparent;
-            color: white;
-        }
-        .ae-btn-primary { background-color: var(--color-success); border-color: var(--color-success); }
-        .ae-btn-primary:hover:not(:disabled) { background-color: #16a34a; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(34, 197, 94, 0.2); }
-        .ae-btn-secondary { background-color: var(--color-info); border-color: var(--color-info); }
-        .ae-btn-secondary:hover:not(:disabled) { background-color: #9333ea; transform: translateY(-1px); box-shadow: 0 4px 10px rgba(168, 85, 247, 0.2); }
-        .ae-file-input {
-            font-size: 0.875rem;
-            color: var(--color-text-muted);
-        }
-        .ae-file-input::file-selector-button {
-            margin-right: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            border: 0;
-            font-size: 0.875rem;
-            font-weight: 600;
-            background-color: var(--color-secondary);
-            color: white;
-            transition: background-color 0.2s;
-            cursor: pointer;
-        }
-        .ae-file-input::file-selector-button:hover { background-color: #2563eb; }
         .divider-text {
             display: flex;
             align-items: center;
@@ -580,33 +552,38 @@
                                 <!-- Preset Loader Section -->
                                 <div class="border-t border-b border-border py-4">
                                     <label class="block text-sm font-semibold text-center text-white mb-3">Load a Preset Pack</label>
-                                    <button id="load-preset-btn" class="ae-btn ae-btn-secondary">
-                                        Load Blackwing Preset Pack
-                                    </button>
+                                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <button id="load-blackwing-preset-btn" class="btn btn-info w-full justify-center">
+                                            Load Blackwing Preset
+                                        </button>
+                                        <button id="load-camaro-preset-btn" class="btn btn-info w-full justify-center">
+                                            Load Camaro Preset
+                                        </button>
+                                    </div>
                                 </div>
 
                                 <!-- Input Section: Paste or Upload -->
                                 <div class="space-y-4">
-                                    <label for="file-list" class="ae-form-label">1. File Paths (one per line)</label>
-                                    <textarea id="file-list" rows="8" class="ae-input ae-textarea" placeholder="\\server\path\to\file1.mov&#10;\\server\path\to\file2.mp4&#10;C:\Users\YourName\Desktop\video.mkv"></textarea>
+                                    <label for="file-list" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">1. File Paths (one per line)</label>
+                                    <textarea id="file-list" rows="8" class="form-element w-full px-4 py-3" style="min-height: 10rem; resize: vertical;" placeholder="\\server\path\to\file1.mov&#10;\\server\path\to\file2.mp4&#10;C:\Users\YourName\Desktop\video.mkv"></textarea>
                                     
                                     <div class="divider-text">OR</div>
 
                                     <div>
-                                        <label for="file-upload" class="ae-form-label">Upload a .txt file</label>
-                                        <input type="file" id="file-upload" accept=".txt" class="ae-file-input w-full">
+                                        <label for="file-upload" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Upload a .txt file</label>
+                                        <input type="file" id="file-upload" accept=".txt" class="form-element w-full text-sm py-3 px-4" style="color: var(--color-text-muted);">
                                     </div>
                                 </div>
 
                                 <!-- Configuration Section -->
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                     <div>
-                                        <label for="folder-name" class="ae-form-label">2. Project Folder Name</label>
-                                        <input type="text" id="folder-name" value="Imported Footage" class="ae-input">
+                                        <label for="folder-name" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">2. Project Folder Name</label>
+                                        <input type="text" id="folder-name" value="Imported Footage" class="form-element w-full px-4 py-3">
                                     </div>
                                     <div>
-                                        <label for="label-color" class="ae-form-label">3. Folder Label Color</label>
-                                        <select id="label-color" class="ae-select">
+                                        <label for="label-color" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">3. Folder Label Color</label>
+                                        <select id="label-color" class="form-element w-full px-4 py-3">
                                             <option value="1">Red</option>
                                             <option value="2">Yellow</option>
                                             <option value="3">Aqua</option>
@@ -623,13 +600,13 @@
 
                                 <!-- Output Filename Section -->
                                 <div>
-                                    <label for="output-filename" class="ae-form-label">4. Script Filename</label>
-                                    <input type="text" id="output-filename" class="ae-input">
+                                    <label for="output-filename" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">4. Script Filename</label>
+                                    <input type="text" id="output-filename" class="form-element w-full px-4 py-3">
                                 </div>
 
                                 <!-- Action Button -->
                                 <div class="pt-2">
-                                    <button id="generate-import-btn" class="ae-btn ae-btn-primary text-lg">
+                                    <button id="generate-import-btn" class="btn btn-success w-full justify-center">
                                         Generate & Download Script
                                     </button>
                                 </div>
@@ -1004,6 +981,27 @@
                 "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1694.MOV",
                 "\\\\192.168.1.207\\AidanOwnby\\Cars\\Customer Cars\\RIFT\\CT5-V short\\IMG_1696.MOV"
             ];
+            
+            const camaroPresetPaths = [
+                "\\\\192.168.1.207\\DaleG\\2024\\11-18\\camaro zl1.mp4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-18\\adobe files\\ae\\camaro.mp4",
+                "\\\\192.168.1.207\\AidanOwnby\\Backups\\B.S (before server)\\Backups\\back up\\dale shorts\\camaro wikd enginebay.mp4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-13\\camaro.mp4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9612.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9600.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9601.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9602.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9603.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9604.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9605.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9606.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9607.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9608.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9609.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9610.MP4",
+                "\\\\192.168.1.207\\DaleG\\2024\\11-6\\ss supercharged camaro\\C9611.MP4",
+                "\\\\192.168.1.207\\AidanOwnby\\Backups\\XD9 Pro Backup\\Adobe Files\\premier file\\Copied_Untitled\\Camaro pull for story with link to youtube.mp4"
+            ];
 
             // --- DOM ELEMENT REFERENCES ---
             const fileListTextarea = document.getElementById('file-list');
@@ -1012,12 +1010,18 @@
             const labelColorSelect = document.getElementById('label-color');
             const outputFilenameInput = document.getElementById('output-filename');
             const generateBtn = document.getElementById('generate-import-btn');
-            const loadPresetBtn = document.getElementById('load-preset-btn');
+            const loadBlackwingPresetBtn = document.getElementById('load-blackwing-preset-btn');
+            const loadCamaroPresetBtn = document.getElementById('load-camaro-preset-btn');
 
             // --- CORE FUNCTIONS ---
             function loadBlackwingPreset() {
                 fileListTextarea.value = blackwingPresetPaths.join('\n');
                 folderNameInput.value = 'Blackwing Footage';
+            }
+
+            function loadCamaroPreset() {
+                fileListTextarea.value = camaroPresetPaths.join('\n');
+                folderNameInput.value = 'Camaro Footage';
             }
 
             function generateDefaultFilename() {
@@ -1051,11 +1055,14 @@
                     return null;
                 }
 
+                // **FIX**: Robust path cleaning and escaping
                 const filesToImportArray = filePathsRaw
                     .split('\n')
-                    .map(path => path.trim())
-                    .filter(path => path.length > 0)
-                    .map(path => `"${path.replace(/\\/g, '\\\\')}"`);
+                    .map(path => path.trim()) // Trim whitespace
+                    .map(path => path.replace(/^"|"$/g, '')) // Remove surrounding quotes
+                    .map(path => path.replace(/\u00A0/g, ' ')) // Replace non-breaking spaces with regular spaces
+                    .filter(path => path.length > 0) // Filter out empty lines
+                    .map(path => `"${path.replace(/\\/g, '\\\\')}"`); // Escape backslashes and add quotes
 
                 if (filesToImportArray.length === 0) {
                     alert("The file list is empty or contains only whitespace.");
@@ -1142,7 +1149,8 @@
             outputFilenameInput.value = generateDefaultFilename();
             fileUploadInput.addEventListener('change', handleFileUpload);
             generateBtn.addEventListener('click', downloadScript);
-            loadPresetBtn.addEventListener('click', loadBlackwingPreset);
+            loadBlackwingPresetBtn.addEventListener('click', loadBlackwingPreset);
+            loadCamaroPresetBtn.addEventListener('click', loadCamaroPreset);
         }
 
         // --- LOGGER CORE LOGIC (Data, UI, etc.) ---
