@@ -557,10 +557,13 @@
         }
 
         function generateSummaryText() {
-            const date = new Date(LOG_DATE_INPUT.value + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'UTC' });
-            let message = `*${CURRENT_USER.toUpperCase()} - DAILY REPORT for ${date}*\n\n`;
-
-            message += `*HOURLY ACTIVITIES*\n`;
+            // Format the date nicely (e.g., 12/3/2025)
+            const dateParts = LOG_DATE_INPUT.value.split('-');
+            const formattedDate = `${parseInt(dateParts[1])}/${parseInt(dateParts[2])}/${dateParts[0]}`;
+            
+            // Reduced whitespace to match user request
+            let message = `*${CURRENT_USER.toUpperCase()} - DAILY REPORT for ${formattedDate}*\n*HOURLY ACTIVITIES*\n`;
+            
             const activities = [
                 { label: '8-9am', value: document.getElementById('activity_8_9').value.trim() },
                 { label: '9-10am', value: document.getElementById('activity_9_10').value.trim() },
@@ -604,11 +607,13 @@
         function handleTextTommy() {
              const message = generateSummaryText();
              const phoneNumber = "+12144549932";
-             // Use encodeURIComponent to ensure special characters like spaces and line breaks work in the URL
-             const smsLink = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
              
-             // Open the SMS link
-             window.open(smsLink, '_blank');
+             // iOS 16 FIX: Using &body= instead of ?body= fixes the "everything in Send To" bug.
+             // Also using window.location.href instead of window.open to be safer on mobile Safari.
+             const smsLink = `sms:${phoneNumber}&body=${encodeURIComponent(message)}`;
+             
+             // Navigate to the link (standard way for Custom URI schemes on mobile)
+             window.location.href = smsLink;
         }
         
         async function getReportData() {
