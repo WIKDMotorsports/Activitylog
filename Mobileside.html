@@ -386,7 +386,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
         import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-        import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1";
 
         // --- GLOBAL DOM ELEMENTS ---
         const COPY_SUMMARY_BUTTON = document.getElementById('copySummaryButton');
@@ -413,18 +412,6 @@
         
         // HARDCODED USER
         const CURRENT_USER = 'Elyas';
-
-        // --- AI MODEL INITIALIZATION ---
-        let summarizerPromise = (async () => {
-            try {
-                // Use the imported pipeline function directly
-                return await pipeline('summarization', 'Xenova/distilbart-cnn-12-6');
-            } catch(e) {
-                console.error("Failed to load summarization model", e);
-                return null;
-            }
-        })();
-
 
         // --- INITIALIZATION ---
         function initializeFirebase() {
