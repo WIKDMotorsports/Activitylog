@@ -1,1 +1,765 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Activity Logger - Elyas</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SheetJS library for XLSX export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --color-background: #0A0A0A;
+            --color-text: #EAEAEA;
+            --color-text-muted: #a1a1aa;
+            --color-primary: #FF3B30;
+            --color-secondary: #3b82f6; 
+            --color-success: #22c55e;
+            --color-surface: #141414;
+            --color-surface-darker: #0A0A0A;
+            --color-border: #2A2A2A;
+            --color-danger: #ef4444;
+            --font-heading: 'Rajdhani', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+        html { box-sizing: border-box; }
+        *, *:before, *:after { box-sizing: inherit; }
+        body {
+            font-family: var(--font-body);
+            background-color: var(--color-background);
+            color: var(--color-text);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+        .container { width: 100%; margin-left: auto; margin-right: auto; padding-left: 1rem; padding-right: 1rem; }
+        @media (min-width: 640px) { .container { max-width: 640px; padding-left: 1.5rem; padding-right: 1.5rem; } }
+        @media (min-width: 768px) { .container { max-width: 768px; } }
+        @media (min-width: 1024px) { .container { max-width: 1024px; padding-left: 2rem; padding-right: 2rem; } }
+        @media (min-width: 1280px) { .container { max-width: 1280px; } }
+        .max-w-4xl { max-width: 56rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .p-4 { padding: 1rem; }
+        .p-6 { padding: 1.5rem; }
+        .p-8 { padding: 2rem; }
+        .pt-4 { padding-top: 1rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }
+        .bg-surface { background-color: var(--color-surface); }
+        .border { border-width: 1px; }
+        .border-border { border-color: var(--color-border); }
+        .border-x { border-left-width: 1px; border-right-width: 1px; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-l-lg { border-top-left-radius: 0.5rem; border-bottom-left-radius: 0.5rem; }
+        .rounded-r-lg { border-top-right-radius: 0.5rem; border-bottom-right-radius: 0.5rem; }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05); }
+        .text-center { text-align: center; }
+        .text-white { color: #fff; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xs { font-size: 0.75rem; line-height: 1rem; }
+        .text-lg { font-size: 1.125rem; line-height: 1.75rem; }
+        .text-xl { font-size: 1.25rem; line-height: 1.75rem; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-4xl { font-size: 2.25rem; line-height: 2.5rem; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .uppercase { text-transform: uppercase; }
+        .mb-1 { margin-bottom: 0.25rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mb-8 { margin-bottom: 2rem; }
+        .mt-1 { margin-top: 0.25rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mt-6 { margin-top: 1.5rem; }
+        .h-4 { height: 1rem; }
+        .w-full { width: 100%; }
+        .w-16 { width: 4rem; }
+        .space-y-2 > :not([hidden]) ~ :not([hidden]) { margin-top: 0.5rem; }
+        .space-y-4 > :not([hidden]) ~ :not([hidden]) { margin-top: 1rem; }
+        .space-y-6 > :not([hidden]) ~ :not([hidden]) { margin-top: 1.5rem; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-6 { gap: 1.5rem; }
+        .flex { display: flex; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .flex-shrink-0 { flex-shrink: 0; }
+        .flex-grow { flex-grow: 1; }
+        @media (min-width: 768px) { .md\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } .sm\:flex-row { flex-direction: row; } }
+        .form-element {
+            background-color: var(--color-surface);
+            border: 1px solid var(--color-border);
+            color: var(--color-text);
+            border-radius: 8px;
+            transition: all 0.2s ease-in-out;
+        }
+        .form-element:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .form-element::placeholder { color: var(--color-text-muted); }
+        
+        .btn {
+            font-family: var(--font-heading);
+            font-weight: 600;
+            font-size: 18px;
+            text-transform: uppercase;
+            border-radius: 8px;
+            padding: 12px 24px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .btn-primary {
+            background-color: var(--color-primary);
+            color: white;
+            border-color: var(--color-primary);
+        }
+        .btn-primary:hover:not(:disabled) {
+            background-color: #E03024;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 59, 48, 0.3);
+        }
+        .btn-secondary {
+            background-color: var(--color-surface);
+            color: var(--color-primary);
+            border-color: var(--color-primary);
+        }
+        .btn-secondary:hover:not(:disabled) { background-color: rgba(255, 59, 48, 0.1); }
+        
+        /* New Huge Button Style */
+        .btn-huge {
+            width: 100%;
+            padding: 1.5rem;
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            background-color: var(--color-success);
+            color: white;
+            border-color: var(--color-success);
+            box-shadow: 0 10px 25px rgba(34, 197, 94, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+        }
+        .btn-huge:hover {
+            background-color: #16a34a;
+            transform: translateY(-3px);
+            box-shadow: 0 15px 30px rgba(34, 197, 94, 0.4);
+        }
+        .btn-huge svg {
+            width: 32px;
+            height: 32px;
+        }
 
+        .btn-info {
+            background-color: var(--color-info);
+            color: white;
+            border-color: var(--color-info);
+        }
+        .btn-info:hover:not(:disabled) {
+            background-color: #9333ea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+        
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            filter: brightness(0) saturate(100%) invert(31%) sepia(93%) saturate(3493%) hue-rotate(352deg) brightness(99%) contrast(106%);
+        }
+        
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0,0,0,0.7); display: flex; align-items: center; justify-content: center;
+            z-index: 100;
+        }
+        .modal-content {
+            background-color: var(--color-surface); padding: 2rem; border-radius: 1rem;
+            border: 1px solid var(--color-border); width: 90%; max-width: 500px;
+        }
+        .hidden { display: none; }
+        
+        /* Report styles */
+        #reportOutput {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--color-border);
+            padding-top: 1.5rem;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .report-card {
+            background-color: #0A0A0A;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--color-border);
+        }
+        .report-card h3 {
+            margin-top: 0;
+            font-family: var(--font-heading);
+            color: var(--color-primary);
+        }
+        .report-card ul {
+            padding-left: 1.5rem;
+            margin: 0.5rem 0 0 0;
+            list-style-type: disc;
+        }
+        .report-card li {
+            margin-bottom: 0.25rem;
+        }
+
+        /* Collapsed Options Styles */
+        #moreOptionsToggle, #hourlyActivitiesToggle {
+            width: 100%;
+            padding: 0.75rem 0.5rem;
+            color: var(--color-text-muted);
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+        }
+        
+        #moreOptionsToggle {
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 1rem;
+        }
+        
+        #hourlyActivitiesToggle {
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        #moreOptionsToggle:hover, #hourlyActivitiesToggle:hover {
+            color: var(--color-text);
+        }
+        
+        #moreOptionsToggle svg, #hourlyActivitiesToggle svg {
+            width: 16px;
+            height: 16px;
+            transition: transform 0.3s;
+        }
+        
+        #moreOptionsToggle.open svg, #hourlyActivitiesToggle.open svg {
+            transform: rotate(180deg);
+        }
+        
+        #moreOptionsContent, #hourlyActivitiesContent {
+            overflow: hidden;
+            max-height: 0;
+            transition: max-height 0.4s ease-out;
+        }
+        
+        #moreOptionsContent {
+            padding: 0 0.5rem;
+        }
+        
+        #moreOptionsContent.open {
+            max-height: 200px;
+            margin-bottom: 1rem;
+        }
+        
+        #hourlyActivitiesContent.open {
+            max-height: 1000px; /* Sufficient height for textareas */
+            padding-bottom: 1rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <div id="mainContent" class="">
+        <div class="container mx-auto max-w-4xl p-4">
+            <div class="bg-surface border border-border rounded-2xl shadow-lg p-6 sm:p-8">
+                <div class="text-center mb-6">
+                    <h1 class="text-3xl sm:text-4xl font-bold text-white uppercase" style="font-family: var(--font-heading);">Activity Logger</h1>
+                    <p class="mt-2 text-sm text-primary uppercase font-bold" style="color: var(--color-primary);">User: Elyas</p>
+                </div>
+
+                <div class="space-y-6">
+                    <!-- Date Selection -->
+                    <div>
+                        <label class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Date</label>
+                        <input type="date" id="logDate" class="mt-1 block w-full px-4 py-3 form-element">
+                    </div>
+                    
+                    <!-- Hourly activities section (Collapsed by default) -->
+                    <div class="border-t border-b border-border py-2">
+                        <div id="hourlyActivitiesToggle">
+                            <span>Hourly Activities</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </div>
+                        <div id="hourlyActivitiesContent">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+                                <textarea id="activity_8_9" placeholder="8am - 9am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_9_10" placeholder="9am - 10am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_10_11" placeholder="10am - 11am" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_11_12" placeholder="11am - 12pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_1_2" placeholder="1pm - 2pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_2_3" placeholder="2pm - 3pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_3_4" placeholder="3pm - 4pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                                <textarea id="activity_4_5" placeholder="4pm - 5pm" rows="2" class="form-element w-full px-4 py-3 data-field"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Main Action: Text Tommy -->
+                    <div class="pt-2">
+                        <button id="textTommyButton" class="btn btn-huge">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path d="M14 1a1 1 0 0 1 1 1v8a1 1 0 0 1-1 1H4.414A2 2 0 0 0 3 11.586l-2 2V2a1 1 0 0 1 1-1h12zM2 0a2 2 0 0 0-2 2v12.793a.5.5 0 0 0 .854.353l2.853-2.853A1 1 0 0 1 4.414 12H14a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2H2z"/>
+                            </svg>
+                            Text Tommy
+                        </button>
+                    </div>
+
+                    <!-- Collapsed Secondary Actions -->
+                    <div>
+                        <div id="moreOptionsToggle">
+                            More Actions
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708 .708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z"/>
+                            </svg>
+                        </div>
+                        <div id="moreOptionsContent">
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-2">
+                                <button id="copySummaryButton" class="btn btn-primary w-full justify-center">Copy Summary</button>
+                                <button id="showExportModalButton" class="btn btn-secondary w-full justify-center">Export History</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="statusMessage" class="text-center text-sm mt-4 h-4"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Export Modal -->
+    <div id="exportModal" class="modal-overlay hidden">
+        <div class="modal-content space-y-6">
+            <div class="flex justify-between items-center">
+                <h2 class="text-2xl font-bold text-white" style="font-family: var(--font-heading);">Export History</h2>
+                <button id="closeExportModalButton" class="text-2xl font-bold" style="color: var(--color-text-muted);">&times;</button>
+            </div>
+            <div>
+                <label for="startDate" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">Start Date</label>
+                <input type="date" id="startDate" class="mt-1 block w-full px-4 py-3 form-element">
+            </div>
+            <div>
+                <label for="endDate" class="block text-sm font-medium mb-1" style="color: var(--color-text-muted);">End Date</label>
+                <input type="date" id="endDate" class="mt-1 block w-full px-4 py-3 form-element">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <button id="generateReportButton" class="btn btn-primary w-full justify-center">Generate Report</button>
+                <button id="exportXlsxButton" class="btn btn-secondary w-full justify-center">Download XLSX</button>
+            </div>
+            <div id="reportHeader" class="hidden justify-between items-center mt-4">
+                 <h3 class="text-xl font-semibold text-white">Generated Report</h3>
+                 <button id="copyReportButton" class="btn btn-secondary py-2 px-4 text-sm uppercase">Copy Report</button>
+            </div>
+            <div id="reportOutput"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, onSnapshot, collection, query, where, getDocs, documentId, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { pipeline } from "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1";
+
+        // --- GLOBAL DOM ELEMENTS ---
+        const COPY_SUMMARY_BUTTON = document.getElementById('copySummaryButton');
+        const TEXT_TOMMY_BUTTON = document.getElementById('textTommyButton');
+        const STATUS_MESSAGE = document.getElementById('statusMessage');
+        const LOG_DATE_INPUT = document.getElementById('logDate');
+        const EXPORT_MODAL = document.getElementById('exportModal');
+        const SHOW_EXPORT_MODAL_BUTTON = document.getElementById('showExportModalButton');
+        const CLOSE_EXPORT_MODAL_BUTTON = document.getElementById('closeExportModalButton');
+        const EXPORT_XLSX_BUTTON = document.getElementById('exportXlsxButton');
+        const GENERATE_REPORT_BUTTON = document.getElementById('generateReportButton');
+        const REPORT_HEADER = document.getElementById('reportHeader');
+        const COPY_REPORT_BUTTON = document.getElementById('copyReportButton');
+        const REPORT_OUTPUT = document.getElementById('reportOutput');
+        const MAIN_CONTENT = document.getElementById('mainContent');
+        const MORE_OPTIONS_TOGGLE = document.getElementById('moreOptionsToggle');
+        const MORE_OPTIONS_CONTENT = document.getElementById('moreOptionsContent');
+        const HOURLY_TOGGLE = document.getElementById('hourlyActivitiesToggle');
+        const HOURLY_CONTENT = document.getElementById('hourlyActivitiesContent');
+
+        let db, auth;
+        let currentLogUnsubscribe = null;
+        let saveTimeout = null;
+        
+        // HARDCODED USER
+        const CURRENT_USER = 'Elyas';
+
+        // --- AI MODEL INITIALIZATION ---
+        let summarizerPromise = (async () => {
+            try {
+                // Use the imported pipeline function directly
+                return await pipeline('summarization', 'Xenova/distilbart-cnn-12-6');
+            } catch(e) {
+                console.error("Failed to load summarization model", e);
+                return null;
+            }
+        })();
+
+
+        // --- INITIALIZATION ---
+        function initializeFirebase() {
+            const firebaseConfig = {
+                apiKey: "AIzaSyD27xD4cCvzYFbdKLOdtF3sxLAPnPpQLo8",
+                authDomain: "activity-log-7d4d6.firebaseapp.com",
+                projectId: "activity-log-7d4d6",
+                storageBucket: "activity-log-7d4d6.appspot.com",
+                messagingSenderId: "751457913972",
+                appId: "1:751457913972:web:ce8972d2aa78c215039521",
+                measurementId: "G-VJEJDWM1NW"
+            };
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                updateStatus('Could not connect to the database.', true);
+            }
+        }
+
+        window.onload = () => {
+            startApp();
+        };
+
+        function startApp() {
+            initializeFirebase();
+            const today = new Date();
+            today.setMinutes(today.getMinutes() - today.getTimezoneOffset());
+            const todayStr = today.toISOString().slice(0,10);
+            LOG_DATE_INPUT.value = todayStr;
+            document.getElementById('endDate').value = todayStr;
+            
+            setupEventListeners();
+            setupDataListenerAndAutoPopulate();
+        }
+
+        // --- EVENT LISTENERS SETUP ---
+        function setupEventListeners() {
+            // Logger Listeners
+            COPY_SUMMARY_BUTTON.onclick = handleCopySummary;
+            TEXT_TOMMY_BUTTON.onclick = handleTextTommy;
+
+            LOG_DATE_INPUT.addEventListener('change', setupDataListenerAndAutoPopulate);
+
+            document.querySelectorAll('.data-field').forEach(field => {
+                field.addEventListener('input', () => {
+                    clearTimeout(saveTimeout);
+                    saveTimeout = setTimeout(saveData, 1000);
+                });
+            });
+
+            // Export Modal
+            SHOW_EXPORT_MODAL_BUTTON.onclick = () => {
+                REPORT_OUTPUT.innerHTML = ''; // Clear previous reports
+                REPORT_HEADER.classList.add('hidden');
+                EXPORT_MODAL.classList.remove('hidden');
+            };
+            CLOSE_EXPORT_MODAL_BUTTON.onclick = () => EXPORT_MODAL.classList.add('hidden');
+            EXPORT_XLSX_BUTTON.onclick = handleExport;
+            GENERATE_REPORT_BUTTON.onclick = handleGenerateReport;
+            COPY_REPORT_BUTTON.onclick = handleCopyReport;
+            
+            // Toggle Logic for "More Actions"
+            MORE_OPTIONS_TOGGLE.onclick = () => {
+                MORE_OPTIONS_TOGGLE.classList.toggle('open');
+                MORE_OPTIONS_CONTENT.classList.toggle('open');
+            };
+            
+            // Toggle Logic for "Hourly Activities"
+            HOURLY_TOGGLE.onclick = () => {
+                HOURLY_TOGGLE.classList.toggle('open');
+                HOURLY_CONTENT.classList.toggle('open');
+            };
+        }
+
+        // --- LOGGER CORE LOGIC (Data, UI, etc.) ---
+
+        async function setupDataListenerAndAutoPopulate() {
+            if (currentLogUnsubscribe) currentLogUnsubscribe();
+            const dateId = LOG_DATE_INPUT.value;
+            if (!dateId || !db) return;
+
+            const docRef = doc(db, "activity_logs", dateId);
+
+            // After the one-time check/population, set up the real-time listener.
+            currentLogUnsubscribe = onSnapshot(docRef, (snapshot) => {
+                clearForm();
+                if (snapshot.exists()) {
+                    const data = snapshot.data();
+                    const userData = data[CURRENT_USER];
+                    if (userData) {
+                        populateForm(userData);
+                    }
+                }
+            }, (error) => {
+                console.error("Error fetching document: ", error);
+                updateStatus("Error loading data.", true);
+            });
+        }
+
+        async function saveData() {
+            const dateId = LOG_DATE_INPUT.value;
+            if (!dateId || !db) return;
+            
+            updateStatus('Saving...', false, true);
+
+            const dataToSave = {
+                activities: {
+                    '8-9': document.getElementById('activity_8_9').value,
+                    '9-10': document.getElementById('activity_9_10').value,
+                    '10-11': document.getElementById('activity_10_11').value,
+                    '11-12': document.getElementById('activity_11_12').value,
+                    '1-2': document.getElementById('activity_1_2').value,
+                    '2-3': document.getElementById('activity_2_3').value,
+                    '3-4': document.getElementById('activity_3_4').value,
+                    '4-5': document.getElementById('activity_4_5').value
+                }
+            };
+
+            try {
+                const docRef = doc(db, "activity_logs", dateId);
+                await setDoc(docRef, { [CURRENT_USER]: dataToSave }, { merge: true });
+                updateStatus('Saved!', false);
+            } catch (error) {
+                console.error("Error saving document: ", error);
+                updateStatus('Save failed.', true);
+            }
+        }
+        
+        function populateForm(userData) {
+            if (userData.activities) {
+                for (const key in userData.activities) {
+                    const element = document.getElementById(`activity_${key.replace('-', '_')}`);
+                    if (element) element.value = userData.activities[key] || '';
+                }
+            }
+        }
+
+        function clearForm() {
+            document.querySelectorAll('.data-field').forEach(field => field.value = '');
+        }
+
+        function generateSummaryText() {
+            const date = new Date(LOG_DATE_INPUT.value + 'T12:00:00').toLocaleDateString('en-US', { timeZone: 'UTC' });
+            let message = `*${CURRENT_USER.toUpperCase()} - DAILY REPORT for ${date}*\n\n`;
+
+            message += `*HOURLY ACTIVITIES*\n`;
+            const activities = [
+                { label: '8-9am', value: document.getElementById('activity_8_9').value.trim() },
+                { label: '9-10am', value: document.getElementById('activity_9_10').value.trim() },
+                { label: '10-11am', value: document.getElementById('activity_10_11').value.trim() },
+                { label: '11am-12pm', value: document.getElementById('activity_11_12').value.trim() },
+                { label: '1-2pm', value: document.getElementById('activity_1_2').value.trim() },
+                { label: '2-3pm', value: document.getElementById('activity_2_3').value.trim() },
+                { label: '3-4pm', value: document.getElementById('activity_3_4').value.trim() },
+                { label: '4-5pm', value: document.getElementById('activity_4_5').value.trim() }
+            ];
+            activities.forEach(act => {
+                if (act.value) message += `- ${act.label}: ${act.value}\n`;
+            });
+            message += '\n';
+            return message;
+        }
+
+        function handleCopySummary() {
+            const message = generateSummaryText();
+            const textArea = document.createElement("textarea");
+            textArea.value = message;
+            textArea.style.position = "fixed";
+            textArea.style.top = "0";
+            textArea.style.left = "0";
+            document.body.appendChild(textArea);
+            textArea.focus();
+            textArea.select();
+            try {
+                if (document.execCommand('copy')) {
+                    updateStatus('Summary copied to clipboard!', false);
+                } else {
+                    updateStatus('Failed to copy.', true);
+                }
+            } catch (err) {
+                updateStatus('Failed to copy.', true);
+                console.error('Clipboard error:', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        function handleTextTommy() {
+             const message = generateSummaryText();
+             const phoneNumber = "+12144549932";
+             // Use encodeURIComponent to ensure special characters like spaces and line breaks work in the URL
+             const smsLink = `sms:${phoneNumber}?body=${encodeURIComponent(message)}`;
+             
+             // Open the SMS link
+             window.open(smsLink, '_blank');
+        }
+        
+        async function getReportData() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            if (!startDate || !endDate || startDate > endDate) {
+                updateStatus('Please select a valid date range.', true);
+                return null;
+            }
+
+            const logsRef = collection(db, 'activity_logs');
+            const q = query(logsRef, where(documentId(), '>=', startDate), where(documentId(), '<=', endDate));
+            const querySnapshot = await getDocs(q);
+
+            if (querySnapshot.empty) {
+                updateStatus('No data found for the selected range.', false);
+                return null;
+            }
+            
+            let dataForExport = [["Date", "User", "Category", "Item", "Description", "Value"]];
+
+            querySnapshot.forEach(doc => {
+                const date = doc.id;
+                const data = doc.data();
+                const log = data[CURRENT_USER];
+
+                if (log) {
+                    if (log.activities) {
+                        for(const time in log.activities) {
+                            if(log.activities[time]) {
+                                dataForExport.push([date, CURRENT_USER, 'Hourly Activity', time, log.activities[time], '']);
+                            }
+                        }
+                    }
+                }
+            });
+            return dataForExport;
+        }
+
+        async function handleExport() {
+            updateStatus('Exporting...', false, true);
+            try {
+                const dataForExport = await getReportData();
+                if (!dataForExport) return;
+
+                const ws = XLSX.utils.aoa_to_sheet(dataForExport);
+                const wb = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(wb, ws, "Activity Log");
+                const startDate = document.getElementById('startDate').value;
+                const endDate = document.getElementById('endDate').value;
+                XLSX.writeFile(wb, `activity_log_${CURRENT_USER}_${startDate}_to_${endDate}.xlsx`);
+
+                updateStatus('Export successful!', false);
+            } catch (error) {
+                console.error("Error exporting data: ", error);
+                updateStatus('Export failed.', true);
+            }
+        }
+
+        async function handleGenerateReport() {
+            REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>Generating report, please wait... This may take a moment.</p></div>`;
+            REPORT_HEADER.classList.add('hidden');
+            try {
+                const dataRows = await getReportData();
+                if (!dataRows || dataRows.length <= 1) {
+                    REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>Not enough data to generate a report.</p></div>`;
+                    return;
+                }
+
+                const analysis = analyzeData(dataRows);
+                
+                REPORT_OUTPUT.innerHTML = renderGeneratedReport(analysis);
+                REPORT_HEADER.classList.remove('hidden');
+
+            } catch(e) {
+                console.error("Error generating report:", e);
+                REPORT_OUTPUT.innerHTML = `<div class="report-card"><p>An error occurred while generating the report.</p></div>`;
+            }
+        }
+        
+        function handleCopyReport() {
+            const reportEl = document.getElementById('reportOutput');
+            let textToCopy = '';
+            
+            const title = reportEl.querySelector('h3').innerText;
+            textToCopy += `*${title}*\n\n`;
+
+            reportEl.querySelectorAll('li').forEach(li => {
+                textToCopy += `- ${li.innerText}\n`;
+            });
+
+            const link = "https://www.wikdmotorsports.com/pages/activity-logger";
+            // Remove PIN
+            textToCopy += `\nView full history: ${link}`;
+
+            const tempTextArea = document.createElement('textarea');
+            tempTextArea.value = textToCopy.trim();
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempTextArea);
+            
+            updateStatus('Report copied to clipboard!', false);
+        }
+
+        function analyzeData(rows) {
+            // Basic analysis for Elyas since he doesn't track metrics
+            const data = rows.slice(1);
+            const analysis = { totalDays: new Set(data.map(r => r[0])).size };
+            return analysis;
+        }
+
+        function renderGeneratedReport(analysis) {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+
+            return `
+                <div class="report-card">
+                    <h3>Elyas Overview Report for ${startDate} to ${endDate}</h3>
+                    <ul>
+                        <li>Total Days Logged: ${analysis.totalDays}</li>
+                    </ul>
+                    <p class="text-xs mt-4" style="color: var(--color-text-muted);">
+                        <a href="https://www.wikdmotorsports.com/pages/activity-logger" target="_blank" style="color: var(--color-secondary);">View Full History</a>
+                    </p>
+                </div>
+            `;
+        }
+        
+        let statusTimeout;
+        function updateStatus(message, isError, persistent = false) {
+            clearTimeout(statusTimeout);
+            STATUS_MESSAGE.textContent = message;
+            STATUS_MESSAGE.style.color = isError ? 'var(--color-danger)' : 'var(--color-success)';
+            if (!persistent) {
+                statusTimeout = setTimeout(() => STATUS_MESSAGE.textContent = '', 3000);
+            }
+        }
+    </script>
+</body>
+</html>
