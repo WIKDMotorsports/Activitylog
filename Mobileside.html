@@ -561,8 +561,8 @@
             const dateParts = LOG_DATE_INPUT.value.split('-');
             const formattedDate = `${parseInt(dateParts[1])}/${parseInt(dateParts[2])}/${dateParts[0]}`;
             
-            // Reduced whitespace to match user request
-            let message = `*${CURRENT_USER.toUpperCase()} - DAILY REPORT for ${formattedDate}*\n*HOURLY ACTIVITIES*\n`;
+            // Added extra returns (\n\n) between sections for better readability in SMS
+            let message = `*${CURRENT_USER.toUpperCase()} - DAILY REPORT for ${formattedDate}*\n\n*HOURLY ACTIVITIES*\n`;
             
             const activities = [
                 { label: '8-9am', value: document.getElementById('activity_8_9').value.trim() },
